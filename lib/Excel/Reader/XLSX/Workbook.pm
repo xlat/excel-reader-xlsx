@@ -105,19 +105,20 @@ sub _read_node {
 
     if ( $node->name eq 'sheet' ) {
 
-        my $name     = $node->getAttribute( 'name' );
-        my $sheet_id = $node->getAttribute( 'sheetId' );
-        my $rel_id   = $node->getAttribute( 'r:id' );
-
+        my	$name     = $node->getAttribute( 'name' );
+        my	$sheet_id = $node->getAttribute( 'sheetId' );
+        my	$rel_id   = $node->getAttribute( 'r:id' );
+			$rel_id   =~ /(\d+)/;
+		my	$index    = $1 - 1;
         # Use the package relationship data to convert the r:id to a filename.
-        my $filename = $self->{_rels}->{$rel_id}->{_target};
+        my	$filename = $self->{_rels}->{$rel_id}->{_target};
 
         # Store the properties to set up a Worksheet reader object.
         push @{ $self->{_worksheet_properties} },
           {
             _name     => $name,
             _sheet_id => $sheet_id,
-            _index    => $sheet_id - 1,
+            _index    => $index,
             _rel_id   => $rel_id,
             _filename => $filename,
           };

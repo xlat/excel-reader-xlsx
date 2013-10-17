@@ -27,7 +27,7 @@ use Excel::Reader::XLSX::Package::SharedStrings;
 Archive::Zip::setErrorHandler( sub { die shift } );
 
 our @ISA     = qw(Exporter);
-our $VERSION = '0.00';
+use version; our $VERSION = version->declare("v0.001_003");
 
 # Error codes for some common errors.
 our $ERROR_none                      = 0;

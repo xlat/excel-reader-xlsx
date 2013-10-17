@@ -3,11 +3,16 @@ Revision history for Perl module Excel::Reader::XLSX.
 + New feature.
 - Removed/deprecated feature.
 ! Bug fix.
+* Place holder
 
 
 NOTE: This software is designated as alpha quality until this notice is removed.
 
-0.01 January XX 2011
+v0.001_003 2013-10-17 08:47:38 America/Los_Angeles
 
-    First CPAN release.
+! Fixed Github bug #7 Sheet index issues
+
+{{$NEXT}}
+
+* Some other cool change
 

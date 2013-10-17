@@ -1,55 +1,78 @@
-#!/usr/bin/perl
 
-use ExtUtils::MakeMaker;
 use strict;
 use warnings;
 
-require 5.008002;
+use 5.008002;
 
-my %deps = (
-    'Archive::Zip'        => 1.30,
-    'XML::LibXML'         => 1.89,
-    'OLE::Storage_Lite'   => 0.19,
+use ExtUtils::MakeMaker 6.30;
+
+
+
+my %WriteMakefileArgs = (
+  "ABSTRACT" => "Efficient data reader for the Excel XLSX file format.\r",
+  "AUTHOR" => "John McNamara <jmcnamara\@cpan.org>",
+  "BUILD_REQUIRES" => {},
+  "CONFIGURE_REQUIRES" => {
+    "ExtUtils::MakeMaker" => "6.30"
+  },
+  "DISTNAME" => "excel-reader-xlsx",
+  "EXE_FILES" => [],
+  "LICENSE" => "perl",
+  "NAME" => "excel::reader::xlsx",
+  "PREREQ_PM" => {
+    "Archive::Zip" => 0,
+    "Carp" => 0,
+    "Exporter" => 0,
+    "File::Temp" => 0,
+    "OLE::Storage_Lite" => 0,
+    "XML::LibXML::Reader" => 0,
+    "strict" => 0,
+    "version" => 0,
+    "warnings" => 0
+  },
+  "TEST_REQUIRES" => {
+    "JSON" => 0,
+    "Test::Differences" => 0,
+    "Test::More" => 0,
+    "lib" => 0
+  },
+  "VERSION" => "v0.001_003",
+  "test" => {
+    "TESTS" => "t/package/content_types/*.t t/package/shared_strings/*.t t/regression/*.t t/regression/workbook/*.t t/regression/worksheet/*.t"
+  }
 );
 
-my %resources = (
-    homepage    => 'http://jmcnamara.github.com/excel-reader-xlsx/',
-    repository  => 'http://github.com/jmcnamara/excel-reader-xlsx',
-    bugtracker  => 'http://github.com/jmcnamara/excel-reader-xlsx/issues',
-    MailingList => 'http://groups.google.com/group/spreadsheet-writeexcel',
-);
 
-my %params = (
-    'AUTHOR'        => 'John McNamara (jmcnamara@cpan.org)',
-    'ABSTRACT'      => 'Efficient data reader for the Excel XLSX file format.',
-    'NAME'          => 'Excel::Reader::XLSX',
-    'VERSION_FROM'  => 'lib/Excel/Reader/XLSX.pm',
-    'NEEDS_LINKING' => 0,
-    'dist'          => { COMPRESS => 'gzip --best', SUFFIX => 'gz' },
-    'PREREQ_PM'     => \%deps,
-    'test'          => { TESTS => 't/*/*.t t/*/*/*.t' }
-
-);
-
-if ( $ExtUtils::MakeMaker::VERSION ge '6.46' ) {
-    $params{META_MERGE} = { resources => \%resources };
+unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {
+  my $tr = delete $WriteMakefileArgs{TEST_REQUIRES};
+  my $br = $WriteMakefileArgs{BUILD_REQUIRES};
+  for my $mod ( keys %$tr ) {
+    if ( exists $br->{$mod} ) {
+      $br->{$mod} = $tr->{$mod} if $tr->{$mod} > $br->{$mod};
+    }
+    else {
+      $br->{$mod} = $tr->{$mod};
+    }
+  }
 }
 
-if ( $ExtUtils::MakeMaker::VERSION ge '6.30_01' ) {
-    $params{LICENSE} = 'perl';
+unless ( eval { ExtUtils::MakeMaker->VERSION(6.56) } ) {
+  my $br = delete $WriteMakefileArgs{BUILD_REQUIRES};
+  my $pp = $WriteMakefileArgs{PREREQ_PM};
+  for my $mod ( keys %$br ) {
+    if ( exists $pp->{$mod} ) {
+      $pp->{$mod} = $br->{$mod} if $br->{$mod} > $pp->{$mod};
+    }
+    else {
+      $pp->{$mod} = $br->{$mod};
+    }
+  }
 }
 
-WriteMakefile(%params);
+delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
+  unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
 
-# Add other targets to the makefile.
-package MY;
-
-sub postamble {
-"
-localdoc : \$(VERSION_FROM)
-	pod2cpanhtml \$(VERSION_FROM) > ~/tmp/pod2html.html
-"
-}
+WriteMakefile(%WriteMakefileArgs);
 
 
 
