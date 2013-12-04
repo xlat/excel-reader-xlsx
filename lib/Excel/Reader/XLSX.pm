@@ -27,7 +27,7 @@ use Excel::Reader::XLSX::Package::SharedStrings;
 Archive::Zip::setErrorHandler( sub { die shift } );
 
 our @ISA     = qw(Exporter);
-use version; our $VERSION = version->declare("v0.001_003");
+use version; our $VERSION = version->declare("v0.001_004");
 
 # Error codes for some common errors.
 our $ERROR_none                      = 0;
@@ -497,6 +497,10 @@ The C<Worksheet> object has the following methods:
      next_row()
      name()
      index()
+		 get_range($range)
+		 get_link($range)
+		 follow_link($link)
+		 get_row($row_number)
 
 =head2 next_row()
 
@@ -524,6 +528,31 @@ object.
 
     my $sheet_index = $worksheet->index();
 
+=head2 get_range($range)
+
+The C<get_range($range)> method returns a L</Cell> object representing the cell referenced by the given $range. It returns undef if there that range doesn't exists.
+
+	my $cell = $worksheet->get_range("A1");
+
+Note, it doesn't works (yet) with workbook and worksheet references.
+
+=head2 get_link($range)
+
+The C<get_link($range)> method returns an hash reference representing the hyperlink under the given $range. The hash contain the following keys: location, display.
+
+	my $link = $worksheet->get_link("A1");
+
+=head2 follow_link($link)
+
+The C<follow_link($link)> method returns a L</Cell> object representing the cell targeted by the given $link . It returns undef if there that range doesn't exists.
+
+	my $linked_cell = $worksheet->follow_link( $link );
+
+=head2 get_row($row_number)
+
+The C<get_row($row_number)> returns the L</Row> object that represent the zero-indexed row at index $row_number or undef if it doesn't exists.
+
+	my $row = $worksheet->get_row( 42 );
 
 =head1 Row
 
@@ -546,6 +575,8 @@ The C<Row> object has the following methods:
     values()
     next_cell()
     row_number()
+		get_cell($col_index)
+		clone()
 
 
 =head2 values()
@@ -609,6 +640,19 @@ The C<row_number()> method returns the zero-indexed row number for the current r
     my $row = $worksheet->next_row();
     print $row->row_number(), "\n";
 
+=head2 get_cell($col_index)
+
+The C<get_cell($col_index)> method returns a L</Cell> object representing the zero-indexed cell at index $col_index in current L</Row> object.
+
+	my $cell = $row->get_cell( 42 );
+	
+=head2 clone()
+
+The C<clone()> method returns a L</Row> object which is a copy of the current one.
+
+	my $row_copy = $row->clone();
+	
+This is usefull if you want to iterate over rows and keep distinct row objects, because next_row() method works with an internal L</Row> object for efficiency.
 
 =head1 Cell
 
@@ -634,6 +678,8 @@ The C<Cell> object has the following methods:
     value()
     row()
     col()
+		range()
+		clone()
 
 For example if we extracted the data for the cells in the first row of the following spreadsheet we would get the values shown below:
 
@@ -683,6 +729,18 @@ The Cell C<row()> method returns the zero-indexed row number of the cell.
 The Cell C<col()> method returns the zero-indexed column number of the cell.
 
     my $col = $cell->col();
+
+=head2 range()
+
+The Cell C<range()> method returns the range of the cell.
+
+	my $range = $cell->range();
+
+=head2 clone()
+
+The Cell C<clone()> method returns a L</Cell> object which is a copy of the current one.
+
+	my $cell_copy = $cell->clone();
 
 
 =head1 EXAMPLE

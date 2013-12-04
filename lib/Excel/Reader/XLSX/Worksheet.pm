@@ -20,7 +20,6 @@ use Carp;
 use Excel::Reader::XLSX::Package::XMLreader;
 use Excel::Reader::XLSX::Row;
 
-
 our @ISA     = qw(Excel::Reader::XLSX::Package::XMLreader);
 our $VERSION = '0.00';
 
@@ -52,6 +51,98 @@ sub new {
     return $self;
 }
 
+###############################################################################
+#
+# _init( $workbook, $sheetprops )
+#
+# Initialize current Worksheet object with it's $workbook and $sheetprops, so it doesn't need external
+# manipulation to build XML reader on demand. (eg: _init_link )
+#
+sub _init{
+		my $self = shift;
+		$self->{_book} = shift;
+		$self->{_props} = shift;	# from workbook _worksheet_properties
+		my $filename =  $self->{_book}->{_package_dir}
+									. $self->{_book}->{_workbook_root}
+									. $self->{_props}->{_filename};
+
+    # Set up the file to read. We don't read data until it is required.
+    $self->_read_file( $filename );
+}
+
+###############################################################################
+#
+# get_link( $range )
+#
+# Return an hash reference if the requested $range has an hyperlink.
+# The hash contain the following keys: location, display
+#
+sub get_link{
+		my ($self, $range) = @_;
+		$self->_init_link unless exists $self->{_links};
+		return $self->{_links}->{ $range };
+}
+
+###############################################################################
+#
+# follow_link( $link )
+#
+# Return the cell of the hyperlink target. 
+# It is cross sheet but not (YET) cross workbook.
+#
+sub follow_link{
+		my ($self, $link) = @_;
+		if($link->{location} =~ /'([^']+)'!(.*)/){
+			my ($sheet, $range) = ($1, $2);
+			return $self->{_book}->worksheet( $sheet )->get_range($range);
+		}
+}
+
+###############################################################################
+#
+# _init_link( )
+#
+# Read all hyperlinks and store them as an hash reference under $self->{_links}
+#
+sub _init_link{
+		my $self = shift;
+		# Set up the file to read.
+		my $reader = Excel::Reader::XLSX::Package::XMLreader->new;		
+		my $filename =  $self->{_book}->{_package_dir}
+									. $self->{_book}->{_workbook_root}
+									. $self->{_props}->{_filename};
+		$reader->_read_file( $filename );
+		$reader->{_reader}->read;
+		my %links;
+		if($reader->{_reader}->nextElement('hyperlinks')){
+			my $link_node = $reader->{_reader}->copyCurrentNode( 1 );
+			my @hyperlink_nodes = $link_node->getChildrenByTagName( 'hyperlink' );
+			foreach(@hyperlink_nodes){
+				$links{ $_->getAttribute('ref') } = { 
+						location => $_->getAttribute('location'), 
+						display  => $_->getAttribute('display')
+					};
+			}
+		}
+		$self->{_links} = \%links;	
+}
+
+###############################################################################
+#
+# get_range( $range )
+#
+# return the Cell object that match $range or undef if it doesn't exists.
+#
+sub get_range{
+	
+	my ($self, $range) = @_;
+	
+	my ($row_number, $cols) = Excel::Reader::XLSX::Row::_range_to_rowcol( $range );
+	
+	my $row = $self->get_row( $row_number );
+	
+	return $row->get_cell( $cols );
+}
 
 ###############################################################################
 #
@@ -106,6 +197,8 @@ sub next_row {
         $row_number = $self->{_previous_row_number} + 1;
     }
 
+		#keep trace of this row object so we could rebuild that row on demand
+		$self->{_rows}->[ $row_number ] = [ $row_reader, $self->{_previous_row_number} ];
 
     if ( !$self->{_row_initialised} ) {
         $self->_init_row();
@@ -113,13 +206,29 @@ sub next_row {
 
     $row = $self->{_row};
     $row->_init( $row_number, $self->{_previous_row_number}, );
-
-
     $self->{_previous_row_number} = $row_number;
 
     return $row;
 }
 
+###############################################################################
+#
+# get_row( $row_number )
+#
+# return the Row object that match $row_number or undef if it doesn't exists.
+#
+sub get_row{
+	my ($self, $row_number) = @_;
+	if(exists $self->{_rows} and @{$self->{_rows}} >= $row_number){
+		return $self->{_rows}->[ $row_number ];
+	}
+	#look if that row exists
+	my $row;
+	while( ($row = $self->next_row) and @{$self->{_rows}} < $row_number ){	}
+	return if @{$self->{_rows}} < $row_number;	#that row doesn't exist?
+	#build row
+	return $row->clone;
+}
 
 ###############################################################################
 #

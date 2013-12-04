@@ -209,12 +209,7 @@ sub _read_worksheets {
         );
 
         # Set up the file to read. We don't read data until it is required.
-        $worksheet->_read_file(
-                $self->{_package_dir}
-              . $self->{_workbook_root}
-              . $sheet->{_filename}
-
-        );
+				$worksheet->_init( $self, $sheet );
 
         # Store the Worksheet reader objects.
         push @{ $self->{_worksheets} }, $worksheet;

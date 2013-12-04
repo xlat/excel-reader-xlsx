@@ -67,7 +67,7 @@ sub _init {
     # Read the child cell nodes.
     my $row_node   = $self->{_reader}->copyCurrentNode( $FULL_DEPTH );
     my @cell_nodes = $row_node->getChildrenByTagName( 'c' );
-
+				
     $self->{_cells}           = \@cell_nodes;
     $self->{_max_cell_index}  = scalar @cell_nodes;
     $self->{_next_cell_index} = 0;
@@ -78,42 +78,43 @@ sub _init {
 #
 # next_cell()
 #
-# Get the cell cell in the current row.
+# Get the next cell in the current row.
 #
 sub next_cell {
-
     my $self = shift;
-    my $cell;
-
+		
     return if $self->{_row_is_empty};
 
     return if $self->{_next_cell_index} >= $self->{_max_cell_index};
 
-    my $cell_node = $self->{_cells}->[ $self->{_next_cell_index} ];
+		my $cell = $self->get_cell( $self->{_next_cell_index} );
+		
+		$self->{_next_cell_index}++;
+		
+		return $cell;
+}
 
-
+###############################################################################
+#
+# get_cell( $col_index )
+#
+# Get the cell at $col_index in current Row object.
+#
+sub get_cell{
+		my ($self, $col_index) = @_;
+    my $cell_node = $self->{_cells}->[ $col_index ];
     my $range = $cell_node->getAttribute( 'r' );
     return unless $range;
-
     # Create or re-use (for efficiency) a Cell object.
-    $cell = $self->{_cell};
+    my $cell = $self->{_cell};
     $cell->_init();
-
-
+		$cell->{_range} = $range;
     ( $cell->{_row}, $cell->{_col} ) = _range_to_rowcol( $range );
-
-
     my $type = $cell_node->getAttribute( 't' );
-
     $cell->{_type} = $type || '';
-
-
     # Read the cell <c> child nodes.
     for my $child_node ( $cell_node->childNodes() ) {
-
         my $node_name = $child_node->nodeName();
-
-
         if ( $node_name eq 'v' ) {
             $cell->{_value}     = $child_node->textContent();
             $cell->{_has_value} = 1;
@@ -128,11 +129,23 @@ sub next_cell {
             $cell->{_has_formula} = 1;
         }
     }
-
-    $self->{_next_cell_index}++;
     return $cell;
 }
 
+###############################################################################
+#
+# clone()
+#
+# Clone the current Row object.
+#
+sub clone {
+	
+		my $self = shift;
+		
+		my $clone = bless { %$self }, ref($self);
+		
+		return $clone;
+}
 
 ###############################################################################
 #
@@ -145,7 +158,6 @@ sub values {
 
     my $self = shift;
     my @values;
-
 
     # The row values are cached to allow multiple calls. Return cached values
     # if present.
