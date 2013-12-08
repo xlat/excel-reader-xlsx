@@ -53,25 +53,6 @@ sub new {
 
 ###############################################################################
 #
-# _init( $workbook, $sheetprops )
-#
-# Initialize current Worksheet object with it's $workbook and $sheetprops, so it doesn't need external
-# manipulation to build XML reader on demand. (eg: _init_link )
-#
-sub _init{
-		my $self = shift;
-		$self->{_book} = shift;
-		$self->{_props} = shift;	# from workbook _worksheet_properties
-		my $filename =  $self->{_book}->{_package_dir}
-									. $self->{_book}->{_workbook_root}
-									. $self->{_props}->{_filename};
-
-    # Set up the file to read. We don't read data until it is required.
-    $self->_read_file( $filename );
-}
-
-###############################################################################
-#
 # get_link( $range )
 #
 # Return an hash reference if the requested $range has an hyperlink.
@@ -87,87 +68,43 @@ sub get_link{
 #
 # follow_link( $link )
 #
-# Return the cell of the hyperlink target. 
+# Return the cell of the hyperlink target in scalar context. 
+# Return $worksheet, $row, $cell in list context 
 # It is cross sheet but not (YET) cross workbook.
 #
 sub follow_link{
-		my ($self, $link) = @_;
-		if($link->{location} =~ /'([^']+)'!(.*)/){
-			my ($sheet, $range) = ($1, $2);
-			return $self->{_book}->worksheet( $sheet )->get_range($range);
-		}
-}
-
-###############################################################################
-#
-# _init_link( )
-#
-# Read all hyperlinks and store them as an hash reference under $self->{_links}
-#
-sub _init_link{
-		my $self = shift;
-		# Set up the file to read.
-		my $reader = Excel::Reader::XLSX::Package::XMLreader->new;		
-		my $filename =  $self->{_book}->{_package_dir}
-									. $self->{_book}->{_workbook_root}
-									. $self->{_props}->{_filename};
-		$reader->_read_file( $filename );
-		$reader->{_reader}->read;
-		my %links;
-		if($reader->{_reader}->nextElement('hyperlinks')){
-			my $link_node = $reader->{_reader}->copyCurrentNode( 1 );
-			my @hyperlink_nodes = $link_node->getChildrenByTagName( 'hyperlink' );
-			foreach(@hyperlink_nodes){
-				$links{ $_->getAttribute('ref') } = { 
-						location => $_->getAttribute('location'), 
-						display  => $_->getAttribute('display')
-					};
-			}
-		}
-		$self->{_links} = \%links;	
+        my ($self, $link) = @_;
+        if($link->{location} =~ /^(?|'([^']+)'!(.*)|([^!]+)!(.*))$/){
+            my ($sheet, $range) = ($1, $2);
+            my $worksheet = $self->{_book}->worksheet( $sheet );
+            return $worksheet->get_range($range) unless wantarray;
+            return ($worksheet, $worksheet->get_range($range));
+        }
 }
 
 ###############################################################################
 #
 # get_range( $range )
 #
-# return the Cell object that match $range or undef if it doesn't exists.
+# In scalar context, return the Cell object that match $range or undef if it doesn't exists.
+# In list context, return the Row and Cell object that match $range or undef if it doesn't exists.
 #
 sub get_range{
-	
-	my ($self, $range) = @_;
-	
-	my ($row_number, $cols) = Excel::Reader::XLSX::Row::_range_to_rowcol( $range );
-	
-	my $row = $self->get_row( $row_number );
-	
-	return $row->get_cell( $cols );
+
+    my ($self, $range) = @_;
+    
+    my ($book_name, $sheet_name, $row_number, $cols) = 
+            $self->{_book}->parse_range( $range );
+    
+    #TODO: retrieve book if defined
+    #TODO: retrieve sheet if defined
+    
+    my $row = $self->get_row( $row_number );
+
+    my $cell = $row->get_cell( $cols );
+    #TODO: patch list mode and append book and sheet objects
+    return wantarray ? ( $row, $cell ) : $cell;
 }
-
-###############################################################################
-#
-# _init_row()
-#
-# TODO.
-#
-sub _init_row {
-
-    my $self = shift;
-
-    # Store reusable Cell object to avoid repeated calls to Cell::new().
-    $self->{_cell} = Excel::Reader::XLSX::Cell->new( $self->{_shared_strings} );
-
-    # Store reusable Row object to avoid repeated calls to Row::new().
-    $self->{_row}       = Excel::Reader::XLSX::Row->new(
-        $self->{_reader},
-        $self->{_shared_strings},
-        $self->{_cell},
-
-    );
-
-    $self->{_row_initialised} = 1;
-}
-
 
 ###############################################################################
 #
@@ -197,15 +134,12 @@ sub next_row {
         $row_number = $self->{_previous_row_number} + 1;
     }
 
-		#keep trace of this row object so we could rebuild that row on demand
-		$self->{_rows}->[ $row_number ] = [ $row_reader, $self->{_previous_row_number} ];
-
     if ( !$self->{_row_initialised} ) {
         $self->_init_row();
     }
 
     $row = $self->{_row};
-    $row->_init( $row_number, $self->{_previous_row_number}, );
+    $row->_init( $row_number );
     $self->{_previous_row_number} = $row_number;
 
     return $row;
@@ -218,16 +152,18 @@ sub next_row {
 # return the Row object that match $row_number or undef if it doesn't exists.
 #
 sub get_row{
-	my ($self, $row_number) = @_;
-	if(exists $self->{_rows} and @{$self->{_rows}} >= $row_number){
-		return $self->{_rows}->[ $row_number ];
-	}
-	#look if that row exists
-	my $row;
-	while( ($row = $self->next_row) and @{$self->{_rows}} < $row_number ){	}
-	return if @{$self->{_rows}} < $row_number;	#that row doesn't exist?
-	#build row
-	return $row->clone;
+    my ($self, $row_number) = @_;
+    die "called with inconsistant row: $row_number" if $row_number < 0;
+    if($row_number < $self->{_previous_row_number}){
+        $self->rewind;
+        $self->{_previous_row_number} = -1;
+    }
+    my $row = $self->{_row};
+    while( ($self->{_previous_row_number} < $row_number)
+             and ($row = $self->next_row) ){
+
+    }
+    return $row;
 }
 
 ###############################################################################
@@ -264,6 +200,70 @@ sub index {
 #
 ###############################################################################
 
+###############################################################################
+#
+# _init_row()
+#
+# TODO.
+#
+sub _init_row {
+
+    my $self = shift;
+
+    # Store reusable Cell object to avoid repeated calls to Cell::new().
+    $self->{_cell} = Excel::Reader::XLSX::Cell->new( $self, $self->{_shared_strings} );
+
+    # Store reusable Row object to avoid repeated calls to Row::new().
+    $self->{_row}  = Excel::Reader::XLSX::Row->new(
+        $self,
+        $self->{_shared_strings},
+        $self->{_cell},
+    );
+
+    $self->{_row_initialised} = 1;
+}
+
+###############################################################################
+#
+# _init_link( )
+#
+# Read all hyperlinks and store them as an hash reference under $self->{_links}
+#
+sub _init_link{
+        my $self = shift;
+        # Set up the file to read.
+        my $reader = $self->clone->{_reader};
+        my %links;
+        if($reader->nextElement('hyperlinks')){
+            my $link_node = $reader->copyCurrentNode( 1 );
+            my @hyperlink_nodes = $link_node->getChildrenByTagName( 'hyperlink' );
+            foreach(@hyperlink_nodes){
+                $links{ $_->getAttribute('ref') } = { 
+                        location => $_->getAttribute('location'), 
+                        display  => $_->getAttribute('display')
+                    };
+            }
+        }
+        $self->{_links} = \%links;	
+}
+###############################################################################
+#
+# _init( $workbook, $sheetprops )
+#
+# Initialize current Worksheet object with it's $workbook and $sheetprops, so it doesn't need external
+# manipulation to build XML reader on demand. (eg: _init_link )
+#
+sub _init{
+        my $self = shift;
+        $self->{_book} = shift;
+        $self->{_props} = shift;    # from workbook _worksheet_properties
+        my $filename =  $self->{_book}->{_package_dir}
+                                    . $self->{_book}->{_workbook_root}
+                                    . $self->{_props}->{_filename};
+
+    # Set up the file to read. We don't read data until it is required.
+    $self->_read_file( $filename );
+}
 
 1;
 

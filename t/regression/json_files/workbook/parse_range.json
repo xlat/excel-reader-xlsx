@@ -1,0 +1,23 @@
+{
+   "caption"     : "Test Workbook::parse_range() method.",
+   "description" : "Test parsing range into book, sheet, row and cols.",
+   "xlsx_file"   : "link01.xlsx",
+   "expected" : [
+	[ "A1", 									null,				null,			0,		0		], 
+	[ "B2", 									null,				null,			1,		1		], 
+	[ "AA1", 									null,				null,			0,		26		], 
+	[ "AB1", 									null,				null,			0,		27		], 
+	[ "NAMED", 								null,				"Sheet1",	2,		3		], 
+	[ "$A1", 									null,				null,			0,		0		], 
+	[ "A$1", 									null,				null,			0,		0		], 
+	[ "$A$1", 								null,				null,			0,		0		], 
+	[ "Sheet1!A1", 						null,				"Sheet1",	0,		0		], 
+	[ "'Sheet1'!A1", 						null,				"Sheet1",	0,		0		], 
+	[ "Sheet1!$A$1", 						null,				"Sheet1",	0,		0		], 
+	[ "'Sheet1'!$A$1", 					null,				"Sheet1",	0,		0		], 
+	[ "data01.xlsx!NAMED", 				"data01.xlsx",	"Sheet1",	2,		3		], 
+	[ "[data01.xlsx]Sheet1!NAMED",	"data01.xlsx",	"Sheet1",	2,		3		], 
+	[ "[data01.xlsx]Sheet1!$C$2",	"data01.xlsx",	"Sheet1",	1,		2		],
+	[ "ZZZZZ",								null,				null,			null,	null	]
+   ]
+}

@@ -38,7 +38,7 @@ sub new {
     my $class = shift;
     my $self  = Excel::Reader::XLSX::Package::XMLreader->new();
 
-    $self->{_reader}         = shift;
+    $self->{_sheet}         = shift;
     $self->{_shared_strings} = shift;
     $self->{_cell}           = shift;
 
@@ -59,7 +59,8 @@ sub _init {
     my $self = shift;
 
     $self->{_row_number}          = shift;
-    $self->{_previous_row_number} = shift;
+    $self->{_previous_row_number} = $self->{_sheet}->{_previous_row_number};
+	$self->{_reader}              = $self->{_sheet}->{_reader};
     $self->{_row_is_empty}        = $self->{_reader}->isEmptyElement();
     $self->{_values}              = undef;
 
@@ -68,7 +69,7 @@ sub _init {
     my $row_node   = $self->{_reader}->copyCurrentNode( $FULL_DEPTH );
     my @cell_nodes = $row_node->getChildrenByTagName( 'c' );
 				
-    $self->{_cells}           = \@cell_nodes;
+    $self->{_cells}               = \@cell_nodes;
     $self->{_max_cell_index}  = scalar @cell_nodes;
     $self->{_next_cell_index} = 0;
 }
@@ -87,11 +88,11 @@ sub next_cell {
 
     return if $self->{_next_cell_index} >= $self->{_max_cell_index};
 
-		my $cell = $self->get_cell( $self->{_next_cell_index} );
-		
-		$self->{_next_cell_index}++;
-		
-		return $cell;
+    my $cell = $self->_mk_cell( $self->{_next_cell_index} );
+
+    $self->{_next_cell_index}++;
+
+    return $cell;
 }
 
 ###############################################################################
@@ -101,15 +102,35 @@ sub next_cell {
 # Get the cell at $col_index in current Row object.
 #
 sub get_cell{
-		my ($self, $col_index) = @_;
-    my $cell_node = $self->{_cells}->[ $col_index ];
-    my $range = $cell_node->getAttribute( 'r' );
-    return unless $range;
+    my ($self, $col_index) = @_;
+    #TODO: improve performance by caching columns indexes.
+    for my $col_node_idx (0 .. $self->{_max_cell_index} -1 ){
+        my $node = $self->{_cells}->[ $col_node_idx ];
+        if(  $self->_get_cell_node_column($node) == $col_index ){
+            return $self->_mk_cell( $col_node_idx );
+        }
+    }
+    return;
+}
+
+sub _get_cell_node_column{
+    my ($self, $cell_node) = @_;
+    my $range = $cell_node->getAttribute( 'r' ) or return;
+    my ( $book, $sheet, $row, $col ) = $self->{_sheet}->{_book}->parse_range( $range );
+    #ignore book, sheet and row.
+    return $col;
+}
+
+sub _mk_cell{
+    my ($self, $col_index) = @_;
+    my $cell_node = $self->{_cells}->[ $col_index ] or return;
+    my $range = $cell_node->getAttribute( 'r' ) or return;
     # Create or re-use (for efficiency) a Cell object.
     my $cell = $self->{_cell};
     $cell->_init();
-		$cell->{_range} = $range;
-    ( $cell->{_row}, $cell->{_col} ) = _range_to_rowcol( $range );
+    $cell->{_range} = $range;
+    #ignore book, sheet
+    ( undef, undef, $cell->{_row}, $cell->{_col} ) = $self->{_sheet}->{_book}->parse_range( $range );
     my $type = $cell_node->getAttribute( 't' );
     $cell->{_type} = $type || '';
     # Read the cell <c> child nodes.
@@ -218,39 +239,6 @@ sub previous_number {
 #
 # Internal methods.
 #
-
-###############################################################################
-#
-# _range_to_rowcol($range)
-#
-# Convert an Excel A1 style ref to a zero indexed row and column.
-#
-sub _range_to_rowcol {
-
-    my ( $col, $row ) = split /(\d+)/, shift;
-
-    $row--;
-
-    my $length = length $col;
-
-    if ( $length == 1 ) {
-        $col = -65 + ord( $col );
-    }
-    elsif ( $length == 2 ) {
-        my @chars = split //, $col;
-        $col = -1729 + ord( $chars[1] ) + 26 * ord( $chars[0] );
-    }
-    else {
-        my @chars = split //, $col;
-        $col =
-          -44_993 +
-          ord( $chars[2] ) +
-          26 * ord( $chars[1] ) +
-          676 * ord( $chars[0] );
-    }
-
-    return $row, $col;
-}
 
 
 1;

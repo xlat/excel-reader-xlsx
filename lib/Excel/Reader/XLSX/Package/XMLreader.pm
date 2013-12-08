@@ -59,6 +59,7 @@ sub _read_file {
     );
 
     $self->{_reader} = $xml_reader;
+    $self->{_source} = { location => $filename };
 
     return $xml_reader;
 }
@@ -82,6 +83,7 @@ sub _read_string {
     );
 
     $self->{_reader} = $xml_reader;
+    $self->{_source} = { string    => $string };
 
     return $xml_reader;
 }
@@ -105,6 +107,9 @@ sub _read_filehandle {
     );
 
     $self->{_reader} = $xml_reader;
+    #not useful, it could not be cloned, may require to wrap $filehandle in something
+    #that allow to rewind stream (by storing data in a tmp file?)
+    $self->{_source} = { IO => $filehandle };
 
     return $xml_reader;
 }
@@ -144,7 +149,58 @@ sub _parse_file {
     return $xml_reader;
 }
 
+##############################################################################
+#
+# clone()
+#
+# Clone the reader and return another one that will restart document from the begining.
+#
+sub clone {
+    my $self = shift;
+    my $clone = __PACKAGE__->new;
 
+    die "clone not implemented on filehandle!" 
+        if exists $self->{_source}->{IO};
+
+   my $xml_reader = XML::LibXML::Reader->new(
+        %{$self->{_source}},
+        no_blanks => 1
+    );
+
+    $clone->{_reader} = $xml_reader;
+    $clone->{_source} = $self->{_source};
+
+    return $clone;
+}
+
+#not tested, that's just a draft...
+# It will be possible to "fork" by reading cloned until it reach the same file position that current object.
+# It may not works if moveTo* methods was called...
+sub fork{
+    my $self = shift;
+    my $fork = $self->clone;
+    my $bytes = $self->{_reader}->byteConsumed;
+    my $freader = $fork->{_reader};
+    while($bytes && $freader->read){
+        last if $freader->byteConsumed == $bytes;
+    }
+    return $fork;
+}
+
+
+#Rewind the reader to the begining
+##############################################################################
+#
+# rewind()
+#
+# Rewind the reader so it will restart document from the begining.
+# To be true, it build a new one.
+#
+sub rewind{
+    my $self = shift;
+    my $clone = $self->clone;
+    $self->{_reader} = $clone->{_reader};
+}
 1;
 
 

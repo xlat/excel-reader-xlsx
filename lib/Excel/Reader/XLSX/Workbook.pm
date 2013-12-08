@@ -123,6 +123,17 @@ sub _read_node {
             _filename => $filename,
           };
     }
+    
+    if( $node->name eq 'definedName' ) {
+        # why $node->value( ) doesn't works?
+        my $name = $node->getAttribute('name');
+        my $value = $node->readInnerXml;
+        $self->{_names}->{ $name } = $value;
+        # other attributes :
+        #    localSheetId="68" 
+        #    hidden="1"
+    }
+    
 }
 
 
@@ -178,12 +189,81 @@ sub worksheet {
 }
 
 
+
+###############################################################################
+#
+# parse_range()
+#
+# Return book, sheet, row and columns extracted from given $range.
+# This method will resolve internal names but not interbook names (at least not yet).
+sub parse_range{
+    my ($self, $range) = @_;
+    my ($book, $sheet, $row, $cols) = (undef, undef, undef, undef);
+    if($range =~ /^\[(?<book>[^\]]+)\](?<sheet>[^!]+)!(?<range>.*)/){
+        $book = $+{book};
+        $sheet = $+{sheet};
+        $range = $+{range};
+    }
+    elsif($range =~ /^(?<book>[^.]+\.[^!]+)!(?<range>.+)/){
+        $book = $+{book};
+        $range = $+{range};
+    }
+resolve_names: 
+    do{
+        if(exists $self->{_names}->{$range}){
+            #resolve name
+            $range = $self->{_names}->{$range};
+            #this new $range can contain an Sheet! prefix
+        }
+        if($range =~ /^(?<sheet>[^!]+)!(?<range>.+)/){
+            $sheet = $+{sheet} if exists $+{sheet};
+            $range = $+{range};
+        }
+    }while( $range =~ /!/ or exists $self->{_names}->{$range});
+    $sheet =~ s/'//g if defined $sheet;
+    ($row, $cols) = _range_to_rowcol( $range );
+
+    return ($book, $sheet, $row, $cols);
+}
+
 ###############################################################################
 #
 # Internal methods.
 #
 ###############################################################################
+###############################################################################
+#
+# _range_to_rowcol($range)
+#
+# Convert an Excel A1 style ref to a zero indexed row and column.
+#
+sub _range_to_rowcol {
+    my $range = shift or return;
+    $range =~s/\$//g;
+    my ( $col, $row ) = split /(\d+)/, $range;
+    return unless defined $row;
+    $row--;
 
+    my $length = length $col;
+
+    if ( $length == 1 ) {
+        $col = -65 + ord( $col );
+    }
+    elsif ( $length == 2 ) {
+        my @chars = split //, $col;
+        $col = -1729 + ord( $chars[1] ) + 26 * ord( $chars[0] );
+    }
+    else {
+        my @chars = split //, $col;
+        $col =
+          -44_993 +
+          ord( $chars[2] ) +
+          26 * ord( $chars[1] ) +
+          676 * ord( $chars[0] );
+    }
+
+    return $row, $col;
+}
 
 ###############################################################################
 #
@@ -209,7 +289,7 @@ sub _read_worksheets {
         );
 
         # Set up the file to read. We don't read data until it is required.
-				$worksheet->_init( $self, $sheet );
+        $worksheet->_init( $self, $sheet );
 
         # Store the Worksheet reader objects.
         push @{ $self->{_worksheets} }, $worksheet;

@@ -1,0 +1,9 @@
+{
+   "caption"     : "Test link target.",
+   "description" : "Simple test of following links.",
+   "xlsx_file"   : "link01.xlsx",
+   "expected" : {
+      "A1" : [ "A5" ],
+      "C1" : [ "" ]
+   }
+}

@@ -454,6 +454,7 @@ The C<Workbook> object has the following methods:
 
     worksheets()
     worksheet()
+	parse_range()
 
 =head2 worksheets()
 
@@ -477,6 +478,19 @@ object using the sheetname or the zero based index.
 
     my $worksheet = $workbook->worksheet( 0 );
 
+ =head2 parse_range()
+
+The Workbook C<parse_range()> method returns book name, sheet name, row number and column number extracted from given $range.
+
+	my ($book, $sheet, $row, $col) = $workbook->parse_range( "AB42" );
+	
+	my ($book, $sheet, $row, $col) = $workbook->parse_range( "NAME" );
+
+	my ($book, $sheet, $row, $col) = $workbook->parse_range( "'Sheet1 name'!E4" );
+
+	my ($book, $sheet, $row, $col) = $workbook->parse_range( "[data01.xlsx]Sheet1!$A$5" );
+
+Note: This method will not resolve external names (at least not yet).
 
 =head1 Worksheet
 
@@ -497,10 +511,10 @@ The C<Worksheet> object has the following methods:
      next_row()
      name()
      index()
-		 get_range($range)
-		 get_link($range)
-		 follow_link($link)
-		 get_row($row_number)
+     get_range($range)
+     get_link($range)
+     follow_link($link)
+     get_row($row_number)
 
 =head2 next_row()
 
@@ -530,9 +544,11 @@ object.
 
 =head2 get_range($range)
 
-The C<get_range($range)> method returns a L</Cell> object representing the cell referenced by the given $range. It returns undef if there that range doesn't exists.
+In scalar context, the C<get_range($range)> method returns a L</Cell> object representing the cell referenced by the given $range. It returns undef if there that range doesn't exists.
+In a list context it returns the L</Row> and L</Cell> objects for the given $range.
 
-	my $cell = $worksheet->get_range("A1");
+	my $cell         = $worksheet->get_range("A1");
+	my ($row, $cell) = $worksheet->get_range("A1");
 
 Note, it doesn't works (yet) with workbook and worksheet references.
 
@@ -544,9 +560,11 @@ The C<get_link($range)> method returns an hash reference representing the hyperl
 
 =head2 follow_link($link)
 
-The C<follow_link($link)> method returns a L</Cell> object representing the cell targeted by the given $link . It returns undef if there that range doesn't exists.
+In scalar context, the C<follow_link($link)> method returns a L</Cell> object representing the cell targeted by the given $link . It returns undef if there that range doesn't exists.
+In list context, it returns the L</Sheet>, L</Row> and L</Cell> objects for the given $link.
 
-	my $linked_cell = $worksheet->follow_link( $link );
+	my $linked_cell          = $worksheet->follow_link( $link );
+	my ($sheet, $row, $cell) = $worksheet->follow_link( $link );
 
 =head2 get_row($row_number)
 
@@ -575,8 +593,8 @@ The C<Row> object has the following methods:
     values()
     next_cell()
     row_number()
-		get_cell($col_index)
-		clone()
+    get_cell($col_index)
+    clone()
 
 
 =head2 values()
@@ -678,8 +696,8 @@ The C<Cell> object has the following methods:
     value()
     row()
     col()
-		range()
-		clone()
+    range()
+    clone()
 
 For example if we extracted the data for the cells in the first row of the following spreadsheet we would get the values shown below:
 
@@ -826,8 +844,6 @@ Either the Perl Artistic Licence L<http://dev.perl.org/licenses/artistic.html> o
 =head1 AUTHOR
 
 John McNamara jmcnamara@cpan.org
-
-
 
 
 =head1 COPYRIGHT

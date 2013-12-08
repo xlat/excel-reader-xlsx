@@ -1,0 +1,10 @@
+{
+   "caption"     : "Test get_cell.",
+   "description" : "Simple test of c.",
+   "xlsx_file"   : "link01.xlsx",
+   "expected" : [ 
+		"Foo", 2, 10, "Bar", 
+		4,
+		"ByName", 5, "Named" 
+	]
+}

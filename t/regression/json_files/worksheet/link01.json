@@ -1,0 +1,110 @@
+{
+   "caption"     : "Test links.",
+   "description" : "Simple test of retrieving links.",
+   "xlsx_file"   : "link01.xlsx",
+   "expected" : {
+      "Sheet1" : [
+         {
+            "row" : 0,
+            "col" : 0,
+            "value" : "Foo",
+			"link" : {
+				"display" : "Foo",
+				"location" : "Sheet1!A5"
+			}
+         },
+         {
+            "row" : 0,
+            "col" : 2,
+            "value" : "ByName",
+			"link" : {
+				"display" : "ByName",
+				"location" : "NAMED"
+			}
+         },
+         {
+            "row" : 2,
+            "col" : 0,
+            "value" : "2",
+			"link" : null
+         },
+         {
+            "row" : 2,
+            "col" : 1,
+            "value" : "4",
+			"link" : null
+         },
+         {
+            "row" : 2,
+            "col" : 2,
+            "value" : "5",
+			"link" : null
+         },
+         {
+            "row" : 3,
+            "col" : 0,
+            "value" : "10",
+			"link" : null
+         },
+         {
+            "row" : 4,
+            "col" : 0,
+            "value" : "Bar",
+			"link" : null
+         },
+         {
+            "row" : 4,
+            "col" : 2,
+            "value" : "Named",
+			"link" : null
+         },
+         {
+            "row" : 5,
+            "col" : 0,
+            "value" : "",
+			"link" : null
+         }
+      ],
+      "Sheet2" : [],
+      "Sheet3" : [
+         {
+            "row" : 0,
+            "col" : 0,
+            "value" : "Foo",
+			"link" : null
+         },
+         {
+            "row" : 1,
+            "col" : 0,
+            "value" : "Goo",
+			"link" : null
+         },
+         {
+            "row" : 2,
+            "col" : 0,
+            "value" : "Moo",
+			"link" : null
+         },
+         {
+            "row" : 3,
+            "col" : 0,
+            "value" : "123",
+			"link" : null
+         }
+      ],
+      "Sheet4" : [
+         {
+            "row" : 0,
+            "col" : 0,
+            "value" : "This is a rich string",
+			"link" : null
+         },
+         {
+            "row" : 2,
+            "col" : 0,
+            "value" : "This is a unicode string €",
+			"link" : null
+         }
+      ]
+   }
+}

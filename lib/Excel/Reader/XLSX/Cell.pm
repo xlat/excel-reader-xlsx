@@ -35,6 +35,7 @@ sub new {
     my $class = shift;
     my $self  = Excel::Reader::XLSX::Package::XMLreader->new();
 
+    $self->{_sheet} = shift;
     $self->{_shared_strings} = shift;
     $self->{_value}          = '';
 

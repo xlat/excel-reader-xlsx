@@ -1,0 +1,6 @@
+{
+   "caption"     : "Test get_range linear.",
+   "description" : "Simple test of get_range calls.",
+   "xlsx_file"   : "link01.xlsx",
+   "expected" : [ "Foo", "ByName", 2, 4, 5, 10, "Bar", "Named" ]
+}
