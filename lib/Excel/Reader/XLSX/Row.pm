@@ -60,7 +60,7 @@ sub _init {
 
     $self->{_row_number}          = shift;
     $self->{_previous_row_number} = $self->{_sheet}->{_previous_row_number};
-	$self->{_reader}              = $self->{_sheet}->{_reader};
+    $self->{_reader}              = $self->{_sheet}->{_reader};
     $self->{_row_is_empty}        = $self->{_reader}->isEmptyElement();
     $self->{_values}              = undef;
 
@@ -68,7 +68,7 @@ sub _init {
     # Read the child cell nodes.
     my $row_node   = $self->{_reader}->copyCurrentNode( $FULL_DEPTH );
     my @cell_nodes = $row_node->getChildrenByTagName( 'c' );
-				
+                
     $self->{_cells}               = \@cell_nodes;
     $self->{_max_cell_index}  = scalar @cell_nodes;
     $self->{_next_cell_index} = 0;
@@ -83,7 +83,7 @@ sub _init {
 #
 sub next_cell {
     my $self = shift;
-		
+        
     return if $self->{_row_is_empty};
 
     return if $self->{_next_cell_index} >= $self->{_max_cell_index};
@@ -116,7 +116,10 @@ sub get_cell{
 sub _get_cell_node_column{
     my ($self, $cell_node) = @_;
     my $range = $cell_node->getAttribute( 'r' ) or return;
-    my ( $book, $sheet, $row, $col ) = $self->{_sheet}->{_book}->parse_range( $range );
+    #must always return one sub_range
+    my @sub_ranges = $self->{_sheet}->{_book}->parse_range( $range );
+    my $items = $sub_ranges[0];
+    my ( $book, $sheet, $row, $col, $subrange ) = @$items;
     #ignore book, sheet and row.
     return $col;
 }
@@ -130,7 +133,10 @@ sub _mk_cell{
     $cell->_init();
     $cell->{_range} = $range;
     #ignore book, sheet
-    ( undef, undef, $cell->{_row}, $cell->{_col} ) = $self->{_sheet}->{_book}->parse_range( $range );
+    #Must always return one sub_range
+    my @sub_ranges = $self->{_sheet}->{_book}->parse_range( $range );
+    my $items = $sub_ranges[0];
+    ( undef, undef, $cell->{_row}, $cell->{_col}, undef ) = @$items;
     my $type = $cell_node->getAttribute( 't' );
     $cell->{_type} = $type || '';
     # Read the cell <c> child nodes.
@@ -160,12 +166,12 @@ sub _mk_cell{
 # Clone the current Row object.
 #
 sub clone {
-	
-		my $self = shift;
-		
-		my $clone = bless { %$self }, ref($self);
-		
-		return $clone;
+    
+        my $self = shift;
+        
+        my $clone = bless { %$self }, ref($self);
+        
+        return $clone;
 }
 
 ###############################################################################

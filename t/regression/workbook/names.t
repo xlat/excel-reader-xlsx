@@ -17,7 +17,7 @@ use Test::More tests => 1;
 #
 # Test setup.
 #
-my $json_filename = 't/regression/json_files/workbook/parse_range.json';
+my $json_filename = 't/regression/json_files/workbook/names.json';
 my $json          = _read_json( $json_filename );
 my $caption       = $json->{caption};
 my $expected      = $json->{expected};
@@ -33,33 +33,12 @@ use Excel::Reader::XLSX;
 
 my $reader   = Excel::Reader::XLSX->new();
 my $workbook = $reader->read_file( $xlsx_file );
-$workbook->{_names} = { 'NAMED' => 'Sheet1!D3' };
-my @ranges = ( 
- 'A1',
- 'B2',
- 'AA1',
- 'AB1',
- 'NAMED',
- '$A1',
- 'A$1',
- '$A$1',
- 'Sheet1!A1',
- '\'Sheet1\'!A1',
- 'Sheet1!$A$1',
- '\'Sheet1\'!$A$1',
- 'data01.xlsx!NAMED',
- '[data01.xlsx]Sheet1!NAMED',
- '[data01.xlsx]Sheet1!$C$2',
- 'ZZZZZ',
- 'A3:C4',
- 'A1,C3,C4',
- 'A1:B2,C3',
-);
-for my $range ( @ranges ) {
 
-    my @refs = $workbook->parse_range( $range );
-    push @$got, [ $range, @refs ];
+my @names = qw( NAMED GROUPED MIXED_GROUP SHEET_SCOPED ARRAY );
+for my $name ( @names ) {
 
+    my @refs = $workbook->{_names}->{ $name };
+    push @$got, [ $name, \@refs ];
 }
 
 # Test the results.

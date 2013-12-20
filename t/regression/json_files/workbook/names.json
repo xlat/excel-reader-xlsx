@@ -1,0 +1,12 @@
+{
+   "caption"     : "Test internals names parsing in Workbook object.",
+   "description" : "Test names.",
+   "xlsx_file"   : "names.xlsx",
+   "expected" : [
+        [ "NAMED",          [   "Sheet1!$C$5" ] ] , 
+        [ "GROUPED",        [   "Sheet1!$B$3:$C$5" ] ] , 
+        [ "MIXED_GROUP",    [   "Sheet1!$A$1,Sheet1!$B$3,Sheet1!$C$5"] ],
+        [ "SHEET_SCOPED",   [   "Sheet1!$C$3" ] ],
+        [ "ARRAY",          [   "Sheet1!$A$3:$C$5" ] ]
+   ]
+}

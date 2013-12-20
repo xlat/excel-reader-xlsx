@@ -31,15 +31,15 @@ our $VERSION = '0.00';
 # using Test::More::is_deeply().
 #
 sub _is_deep_diff {
-    my ( $got, $expected, $caption, ) = @_;
-
+    my ( $got, $expected, $caption, $context ) = @_;
+    $context //= { context => 20 };
     eval {
         require Test::Differences;
         Test::Differences->import();
     };
 
     if ( !$@ ) {
-        eq_or_diff( $got, $expected, $caption, { context => 1 } );
+        eq_or_diff( $got, $expected, $caption, $context );
     }
     else {
         is_deeply( $got, $expected, $caption );

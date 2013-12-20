@@ -132,12 +132,33 @@ sub range {
 # return a clone of the current Cell object.
 #
 sub clone {
-	
-		my $self = shift;
-		
-		my $clone = bless { %$self }, ref($self);
-		
-		return $clone;
+
+    my $self = shift;
+    
+    my $clone = bless { %$self }, ref($self);
+    
+    return $clone;
+}
+
+
+sub formula{
+    
+    my $self = shift;
+    
+    return $self->{_formula} if $self->{_has_formula};
+}
+
+sub get_hyperlink{
+    
+    my $self = shift;
+    
+    if(my $formula = $self->formula){
+        if($formula =~ /HYPERLINK\("([^"]+)","([^"]*)"\)/i){
+            my ($range, $display) = ($1, $2);
+            return { display => $display, location => $range };
+        }
+    }
+    return undef;
 }
 
 1;

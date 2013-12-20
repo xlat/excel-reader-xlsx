@@ -454,7 +454,7 @@ The C<Workbook> object has the following methods:
 
     worksheets()
     worksheet()
-	parse_range()
+    parse_range()
 
 =head2 worksheets()
 
@@ -482,15 +482,18 @@ object using the sheetname or the zero based index.
 
 The Workbook C<parse_range()> method returns book name, sheet name, row number and column number extracted from given $range.
 
-	my ($book, $sheet, $row, $col) = $workbook->parse_range( "AB42" );
-	
-	my ($book, $sheet, $row, $col) = $workbook->parse_range( "NAME" );
+    my ($book, $sheet, $row, $col) = $workbook->parse_range( "AB42" );
+    
+    my ($book, $sheet, $row, $col) = $workbook->parse_range( "NAME" );
 
-	my ($book, $sheet, $row, $col) = $workbook->parse_range( "'Sheet1 name'!E4" );
+    my ($book, $sheet, $row, $col) = $workbook->parse_range( "'Sheet1 name'!E4" );
 
-	my ($book, $sheet, $row, $col) = $workbook->parse_range( "[data01.xlsx]Sheet1!$A$5" );
+    my ($book, $sheet, $row, $col) = $workbook->parse_range( "[data01.xlsx]Sheet1!$A$5" );
+    
+    my @cell_refs                  = $workbook->parse_range( "A1:C3" );
+    #$cell_refs is a list of arrays [ $book, $sheet, $row, $col ]
 
-Note: This method will not resolve external names (at least not yet).
+Note: This method will not resolve external names (at least not yet). And it doesn't actualy parse list of range.
 
 =head1 Worksheet
 
@@ -547,8 +550,8 @@ object.
 In scalar context, the C<get_range($range)> method returns a L</Cell> object representing the cell referenced by the given $range. It returns undef if there that range doesn't exists.
 In a list context it returns the L</Row> and L</Cell> objects for the given $range.
 
-	my $cell         = $worksheet->get_range("A1");
-	my ($row, $cell) = $worksheet->get_range("A1");
+    my $cell         = $worksheet->get_range("A1");
+    my ($row, $cell) = $worksheet->get_range("A1");
 
 Note, it doesn't works (yet) with workbook and worksheet references.
 
@@ -556,21 +559,21 @@ Note, it doesn't works (yet) with workbook and worksheet references.
 
 The C<get_link($range)> method returns an hash reference representing the hyperlink under the given $range. The hash contain the following keys: location, display.
 
-	my $link = $worksheet->get_link("A1");
+    my $link = $worksheet->get_link("A1");
 
 =head2 follow_link($link)
 
 In scalar context, the C<follow_link($link)> method returns a L</Cell> object representing the cell targeted by the given $link . It returns undef if there that range doesn't exists.
 In list context, it returns the L</Sheet>, L</Row> and L</Cell> objects for the given $link.
 
-	my $linked_cell          = $worksheet->follow_link( $link );
-	my ($sheet, $row, $cell) = $worksheet->follow_link( $link );
+    my $linked_cell          = $worksheet->follow_link( $link );
+    my ($sheet, $row, $cell) = $worksheet->follow_link( $link );
 
 =head2 get_row($row_number)
 
 The C<get_row($row_number)> returns the L</Row> object that represent the zero-indexed row at index $row_number or undef if it doesn't exists.
 
-	my $row = $worksheet->get_row( 42 );
+    my $row = $worksheet->get_row( 42 );
 
 =head1 Row
 
@@ -662,19 +665,17 @@ The C<row_number()> method returns the zero-indexed row number for the current r
 
 The C<get_cell($col_index)> method returns a L</Cell> object representing the zero-indexed cell at index $col_index in current L</Row> object.
 
-	my $cell = $row->get_cell( 42 );
-	
+    my $cell = $row->get_cell( 42 );
+    
 =head2 clone()
 
 The C<clone()> method returns a L</Row> object which is a copy of the current one.
 
-	my $row_copy = $row->clone();
-	
+    my $row_copy = $row->clone();
+    
 This is usefull if you want to iterate over rows and keep distinct row objects, because next_row() method works with an internal L</Row> object for efficiency.
 
 =head1 Cell
-
-=head2 Cell Methods
 
 The C<Cell> object is used to extract data from Excel cells:
 
@@ -691,6 +692,8 @@ The C<Cell> object is used to extract data from Excel cells:
         }
     }
 
+=head2 Cell Methods
+
 The C<Cell> object has the following methods:
 
     value()
@@ -698,6 +701,8 @@ The C<Cell> object has the following methods:
     col()
     range()
     clone()
+    formula()
+    get_hyperlink()
 
 For example if we extracted the data for the cells in the first row of the following spreadsheet we would get the values shown below:
 
@@ -752,14 +757,27 @@ The Cell C<col()> method returns the zero-indexed column number of the cell.
 
 The Cell C<range()> method returns the range of the cell.
 
-	my $range = $cell->range();
+    my $range = $cell->range();
 
 =head2 clone()
 
 The Cell C<clone()> method returns a L</Cell> object which is a copy of the current one.
 
-	my $cell_copy = $cell->clone();
+    my $cell_copy = $cell->clone();
 
+=head2 formula()
+
+The Cell C<formula()> method returns the formula if it exists.
+
+    my $formula = $cell->formula();
+
+=head2 get_hyperlink()
+
+The Cell C<get_hyperlink()> method returns the hyperlink inside a formula if it exists and can parse it.
+
+    #consider that $cell->formula eq 'HYPERLINK("A1","Link to A1")'
+    my $link = $cell->get_hyperlink();
+    # $link looks like { display => 'Link to A1', location => 'A1' }
 
 =head1 EXAMPLE
 
@@ -844,6 +862,7 @@ Either the Perl Artistic Licence L<http://dev.perl.org/licenses/artistic.html> o
 =head1 AUTHOR
 
 John McNamara jmcnamara@cpan.org
+Nicolas Georges xlat@cpan.org ( see fork http://github.com/xlat/excel-reader-xlsx)
 
 
 =head1 COPYRIGHT

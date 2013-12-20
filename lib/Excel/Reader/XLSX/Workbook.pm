@@ -108,8 +108,8 @@ sub _read_node {
         my	$name     = $node->getAttribute( 'name' );
         my	$sheet_id = $node->getAttribute( 'sheetId' );
         my	$rel_id   = $node->getAttribute( 'r:id' );
-			$rel_id   =~ /(\d+)/;
-		my	$index    = $1 - 1;
+            $rel_id   =~ /(\d+)/;
+        my	$index    = $1 - 1;
         # Use the package relationship data to convert the r:id to a filename.
         my	$filename = $self->{_rels}->{$rel_id}->{_target};
 
@@ -132,6 +132,7 @@ sub _read_node {
         # other attributes :
         #    localSheetId="68" 
         #    hidden="1"
+        #    and maybe others like comment
     }
     
 }
@@ -194,11 +195,11 @@ sub worksheet {
 #
 # parse_range()
 #
-# Return book, sheet, row and columns extracted from given $range.
-# This method will resolve internal names but not interbook names (at least not yet).
+# Return book, sheet, row, column and range extracted from given $range.
+# This method will resolve internal names but not interbook names (at least not yet) nor list of ranges.
 sub parse_range{
     my ($self, $range) = @_;
-    my ($book, $sheet, $row, $cols) = (undef, undef, undef, undef);
+    my ($book, $sheet, $row, $col) = (undef, undef, undef, undef);
     if($range =~ /^\[(?<book>[^\]]+)\](?<sheet>[^!]+)!(?<range>.*)/){
         $book = $+{book};
         $sheet = $+{sheet};
@@ -221,9 +222,26 @@ resolve_names:
         }
     }while( $range =~ /!/ or exists $self->{_names}->{$range});
     $sheet =~ s/'//g if defined $sheet;
-    ($row, $cols) = _range_to_rowcol( $range );
-
-    return ($book, $sheet, $row, $cols);
+    my @refs;
+    foreach $range ( split /[,;]/, $range ){
+        if($range =~/^([^:]+):(.*)$/){
+            my ($start, $end) = split ':', $range;
+            my ($start_row, $start_col) = _range_to_rowcol( $start );
+            my ($end_row,   $end_col)   = _range_to_rowcol( $end );
+            foreach $row ($start_row .. $end_row){
+                foreach $col ($start_col .. $end_col){
+                    my $subrange = _rowcol_to_range( $row, $col );
+                    push @refs, [$book, $sheet, $row, $col, $subrange];
+                }
+            }
+        }
+        else{
+            ($row, $col) = _range_to_rowcol( $range );
+            $range =~ s/\$//g;
+            push @refs, [$book, $sheet, $row, $col, $range];
+        }
+    }
+    return @refs;
 }
 
 ###############################################################################
@@ -263,6 +281,28 @@ sub _range_to_rowcol {
     }
 
     return $row, $col;
+}
+
+sub _rowcol_to_range {
+    my ($row, $col) = @_;
+    my $range;
+    
+    if( $col > 26 ){
+        if($col > 701){
+            $range = chr( int(int(($col / 26) / 26) + 64) ). 
+                     chr( int(($col / 26) % 26 + 64) ). 
+                     chr( int($col % 26 + 65) );
+        }else{
+            $range = chr( int($col / 26 + 64) ). 
+                     chr( int($col % 26 + 65) );
+        }
+    }
+    else{
+        $range = chr( $col + 65 );
+    }
+    
+    $range .= $row + 1;
+    return $range;
 }
 
 ###############################################################################

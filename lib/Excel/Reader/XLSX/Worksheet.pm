@@ -59,9 +59,9 @@ sub new {
 # The hash contain the following keys: location, display
 #
 sub get_link{
-		my ($self, $range) = @_;
-		$self->_init_link unless exists $self->{_links};
-		return $self->{_links}->{ $range };
+        my ($self, $range) = @_;
+        $self->_init_link unless exists $self->{_links};
+        return $self->{_links}->{ $range };
 }
 
 ###############################################################################
@@ -74,7 +74,7 @@ sub get_link{
 #
 sub follow_link{
         my ($self, $link) = @_;
-        if($link->{location} =~ /^(?|'([^']+)'!(.*)|([^!]+)!(.*))$/){
+        if($link->{location} and $link->{location} =~ /^(?|'([^']+)'!(.*)|([^!]+)!(.*))$/){
             my ($sheet, $range) = ($1, $2);
             my $worksheet = $self->{_book}->worksheet( $sheet );
             return $worksheet->get_range($range) unless wantarray;
@@ -92,9 +92,8 @@ sub follow_link{
 sub get_range{
 
     my ($self, $range) = @_;
-    
-    my ($book_name, $sheet_name, $row_number, $cols) = 
-            $self->{_book}->parse_range( $range );
+    my @sub_ranges = $self->{_book}->parse_range( $range );
+    my ($book_name, $sheet_name, $row_number, $cols, $subrange) = @{$sub_ranges[0]};
     
     #TODO: retrieve book if defined
     #TODO: retrieve sheet if defined
@@ -238,13 +237,17 @@ sub _init_link{
             my $link_node = $reader->copyCurrentNode( 1 );
             my @hyperlink_nodes = $link_node->getChildrenByTagName( 'hyperlink' );
             foreach(@hyperlink_nodes){
-                $links{ $_->getAttribute('ref') } = { 
-                        location => $_->getAttribute('location'), 
-                        display  => $_->getAttribute('display')
-                    };
+                my $ref_range = $_->getAttribute('ref');
+                my %target = ( 
+                                location => $_->getAttribute('location'), 
+                                display  => $_->getAttribute('display')
+                            );
+               foreach my $ref ( $self->{_book}->parse_range( $ref_range ) ){
+                    $links{ $ref->[-1] } = \%target;
+                }
             }
         }
-        $self->{_links} = \%links;	
+        $self->{_links} = \%links;
 }
 ###############################################################################
 #
@@ -258,8 +261,8 @@ sub _init{
         $self->{_book} = shift;
         $self->{_props} = shift;    # from workbook _worksheet_properties
         my $filename =  $self->{_book}->{_package_dir}
-                                    . $self->{_book}->{_workbook_root}
-                                    . $self->{_props}->{_filename};
+                        . $self->{_book}->{_workbook_root}
+                        . $self->{_props}->{_filename};
 
     # Set up the file to read. We don't read data until it is required.
     $self->_read_file( $filename );

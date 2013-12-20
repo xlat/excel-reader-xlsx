@@ -8,61 +8,79 @@
             "row" : 0,
             "col" : 0,
             "value" : "Foo",
-			"link" : {
-				"display" : "Foo",
-				"location" : "Sheet1!A5"
-			}
+            "link" : {
+                "display" : "Foo",
+                "location" : "Sheet1!A5"
+            }
          },
          {
             "row" : 0,
             "col" : 2,
             "value" : "ByName",
-			"link" : {
-				"display" : "ByName",
-				"location" : "NAMED"
-			}
+            "link" : {
+                "display" : "ByName",
+                "location" : "NAMED"
+            }
+         },
+         {
+            "row" : 0,
+            "col" : 4,
+            "value" : "ByFormula",
+            "link" : {
+                "display" : "ByFormula",
+                "location" : "[link01.xlsx]Sheet1!A5"
+            }
+         },
+         {
+            "row" : 1,
+            "col" : 4,
+            "value" : "ByFormula2",
+            "link" : {
+                "display" : "ByFormula2",
+                "location" : "[link01.xlsx]A5"
+            }
          },
          {
             "row" : 2,
             "col" : 0,
             "value" : "2",
-			"link" : null
+            "link" : null
          },
          {
             "row" : 2,
             "col" : 1,
             "value" : "4",
-			"link" : null
+            "link" : null
          },
          {
             "row" : 2,
             "col" : 2,
             "value" : "5",
-			"link" : null
+            "link" : null
          },
          {
             "row" : 3,
             "col" : 0,
             "value" : "10",
-			"link" : null
+            "link" : null
          },
          {
             "row" : 4,
             "col" : 0,
             "value" : "Bar",
-			"link" : null
+            "link" : null
          },
          {
             "row" : 4,
             "col" : 2,
             "value" : "Named",
-			"link" : null
+            "link" : null
          },
          {
             "row" : 5,
             "col" : 0,
             "value" : "",
-			"link" : null
+            "link" : null
          }
       ],
       "Sheet2" : [],
@@ -71,25 +89,25 @@
             "row" : 0,
             "col" : 0,
             "value" : "Foo",
-			"link" : null
+            "link" : null
          },
          {
             "row" : 1,
             "col" : 0,
             "value" : "Goo",
-			"link" : null
+            "link" : null
          },
          {
             "row" : 2,
             "col" : 0,
             "value" : "Moo",
-			"link" : null
+            "link" : null
          },
          {
             "row" : 3,
             "col" : 0,
             "value" : "123",
-			"link" : null
+            "link" : null
          }
       ],
       "Sheet4" : [
@@ -97,13 +115,13 @@
             "row" : 0,
             "col" : 0,
             "value" : "This is a rich string",
-			"link" : null
+            "link" : null
          },
          {
             "row" : 2,
             "col" : 0,
             "value" : "This is a unicode string €",
-			"link" : null
+            "link" : null
          }
       ]
    }

@@ -36,22 +36,23 @@ my $workbook = $reader->read_file( $xlsx_file );
 
 for my $worksheet ( $workbook->worksheets() ) {
 
-	my $sheetname = $worksheet->name();
-	$got->{$sheetname} = [];
+    my $sheetname = $worksheet->name();
+    $got->{$sheetname} = [];
 
-	while ( my $row = $worksheet->next_row() ) {
+    while ( my $row = $worksheet->next_row() ) {
 
-		while ( my $cell = $row->next_cell() ) {
+        while ( my $cell = $row->next_cell() ) {
 
-			my $row   = $cell->row();
-			my $col   = $cell->col();
-			my $value = $cell->value();
-			my $link = $worksheet->get_link( $cell->range );
+            my $row   = $cell->row();
+            my $col   = $cell->col();
+            my $value = $cell->value();
+            my $link = $worksheet->get_link( $cell->range );
+            $link = $cell->get_hyperlink() unless $link;
 
-			push @{ $got->{$sheetname} },
-			  { row => $row, col => $col, value => $value, link => $link };
-		}
-	}
+            push @{ $got->{$sheetname} },
+              { row => $row, col => $col, value => $value, link => $link };
+        }
+    }
 }
 
 # Test the results.

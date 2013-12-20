@@ -37,7 +37,6 @@ my $workbook = $reader->read_file( $xlsx_file );
 my $worksheet = $workbook->worksheet(0);
 #access values column by column.
 foreach my $range ( qw% A1 A3 A4 A5 B3  B5 C1 C3 $C$5 NAMED % ){
-	$DB::single =1;
 	my $cell = $worksheet->get_range($range);
 	push @$got, $cell->value 
 		if ref $cell eq 'Excel::Reader::XLSX::Cell';
