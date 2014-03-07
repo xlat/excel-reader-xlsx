@@ -215,6 +215,7 @@ resolve_names:
             #resolve name
             $range = $self->{_names}->{$range};
             #this new $range can contain an Sheet! prefix
+            return if $range eq '#REF!';
         }
         if($range =~ /^(?<sheet>[^!]+)!(?<range>.+)/){
             $sheet = $+{sheet} if exists $+{sheet};

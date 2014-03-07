@@ -73,12 +73,13 @@ sub get_link{
 # It is cross sheet but not (YET) cross workbook.
 #
 sub follow_link{
-        my ($self, $link) = @_;
+        my ($self, $link, $wantsheet, $wantbook) = @_;
+        $wantsheet //= 1;
         if($link->{location} and $link->{location} =~ /^(?|'([^']+)'!(.*)|([^!]+)!(.*))$/){
             my ($sheet, $range) = ($1, $2);
             my $worksheet = $self->{_book}->worksheet( $sheet );
-            return $worksheet->get_range($range) unless wantarray;
-            return ($worksheet, $worksheet->get_range($range));
+            return scalar $worksheet->get_range($range) unless wantarray;
+            return ( $worksheet->get_range($range, $wantsheet, $wantbook) );
         }
 }
 
@@ -90,19 +91,19 @@ sub follow_link{
 # In list context, return the Row and Cell object that match $range or undef if it doesn't exists.
 #
 sub get_range{
-
-    my ($self, $range) = @_;
-    my @sub_ranges = $self->{_book}->parse_range( $range );
+    my ($self, $range, $wantsheet, $wantbook) = @_;
+    my @sub_ranges = $self->{_book}->parse_range( $range ) or return;
     my ($book_name, $sheet_name, $row_number, $cols, $subrange) = @{$sub_ranges[0]};
-    
-    #TODO: retrieve book if defined
-    #TODO: retrieve sheet if defined
-    
     my $row = $self->get_row( $row_number );
-
     my $cell = $row->get_cell( $cols );
-    #TODO: patch list mode and append book and sheet objects
-    return wantarray ? ( $row, $cell ) : $cell;
+    return $cell unless wantarray;
+    return ( $row, $cell ) unless $wantsheet or $wantbook;
+    my $sheet = $wantsheet ? $self->{_book}->worksheet($sheet_name) : undef;
+    return ( $sheet, $row, $cell ) if $wantsheet and not $wantbook;
+    my $reader = Excel::Reader::XLSX->new();
+    my $book = $reader->read_file( $book_name ) 
+        or die $reader->error(), "\n";
+    return ( $book, $sheet, $row, $cell ) if $wantbook;
 }
 
 ###############################################################################
