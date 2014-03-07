@@ -94,16 +94,17 @@ sub get_range{
     my ($self, $range, $wantsheet, $wantbook) = @_;
     my @sub_ranges = $self->{_book}->parse_range( $range ) or return;
     my ($book_name, $sheet_name, $row_number, $cols, $subrange) = @{$sub_ranges[0]};
-    my $row = $self->get_row( $row_number );
+    $sheet_name //= $self->name;
+    my $sheet = $self->name eq $sheet_name ? $self : $self->{_book}->worksheet($sheet_name);
+    my $row = $sheet->get_row( $row_number );
     my $cell = $row->get_cell( $cols );
     return $cell unless wantarray;
     return ( $row, $cell ) unless $wantsheet or $wantbook;
-    my $sheet = $wantsheet ? $self->{_book}->worksheet($sheet_name) : undef;
     return ( $sheet, $row, $cell ) if $wantsheet and not $wantbook;
     my $reader = Excel::Reader::XLSX->new();
     my $book = $reader->read_file( $book_name ) 
         or die $reader->error(), "\n";
-    return ( $book, $sheet, $row, $cell ) if $wantbook;
+    return ( $book, ($wantsheet ? $sheet : undef), $row, $cell ) if $wantbook;
 }
 
 ###############################################################################
