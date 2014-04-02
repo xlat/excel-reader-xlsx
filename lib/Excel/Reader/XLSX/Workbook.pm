@@ -128,7 +128,7 @@ sub _read_node {
         # why $node->value( ) doesn't works?
         my $name = $node->getAttribute('name');
         my $value = $node->readInnerXml;
-        $self->{_names}->{ $name } = $value;
+        $self->{_names}->{ uc $name } = $value;
         # other attributes :
         #    localSheetId="68" 
         #    hidden="1"
@@ -211,9 +211,9 @@ sub parse_range{
     }
 resolve_names: 
     do{
-        if(exists $self->{_names}->{$range}){
+        if(exists $self->{_names}->{uc $range}){
             #resolve name
-            $range = $self->{_names}->{$range};
+            $range = $self->{_names}->{uc $range};
             #this new $range can contain an Sheet! prefix
             return if $range eq '#REF!';
         }
@@ -221,7 +221,7 @@ resolve_names:
             $sheet = $+{sheet} if exists $+{sheet};
             $range = $+{range};
         }
-    }while( $range =~ /!/ or exists $self->{_names}->{$range});
+    }while( $range =~ /!/ or exists $self->{_names}->{uc $range});
     $sheet =~ s/'//g if defined $sheet;
     my @refs;
     foreach $range ( split /[,;]/, $range ){
