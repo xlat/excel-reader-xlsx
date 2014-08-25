@@ -26,7 +26,6 @@ our $VERSION = '0.00';
 
 our $FULL_DEPTH = 1;
 
-
 ###############################################################################
 #
 # new()
@@ -86,7 +85,7 @@ sub next_cell {
         
     return if $self->{_row_is_empty};
 
-    return if $self->{_next_cell_index} >= $self->{_max_cell_index};
+    return if $self->{_next_cell_index} > $self->{_max_cell_index};
 
     my $cell = $self->_mk_cell( $self->{_next_cell_index} );
 

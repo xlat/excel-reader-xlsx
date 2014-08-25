@@ -23,7 +23,14 @@
             "previous_row" : 4
          }
       ],
-      "Sheet2" : [],
+      "Sheet2" : [
+        {
+          "previous_row" : -1
+        },
+        {
+          "previous_row" : 0
+        }
+      ],
       "Sheet3" : [
          {
             "previous_row" : -1

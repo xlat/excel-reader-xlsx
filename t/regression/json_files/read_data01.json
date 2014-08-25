@@ -17,7 +17,7 @@
          {
             "row" : 2,
             "col" : 1,
-            "value" : "4"
+            "value" : "42"
          },
          {
             "row" : 2,
@@ -35,12 +35,28 @@
             "value" : "Bar"
          },
          {
+           "row" : 4,
+           "col" : 3,
+           "value" : "bar"
+         },
+         {
             "row" : 5,
             "col" : 0,
             "value" : ""
          }
       ],
-      "Sheet2" : [],
+      "Sheet2" : [
+         {
+           "col" : 0,
+           "row" : 0,
+           "value" : "+++Hihi!"
+         },
+         {
+           "col" : 2,
+           "row" : 6,
+           "value" : "(+c7+)"
+         }
+      ],
       "Sheet3" : [
          {
             "row" : 0,

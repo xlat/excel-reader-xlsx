@@ -42,21 +42,20 @@ for(1..2){
 		$got->{$sheetname} = [];
 
 		while ( my $row = $worksheet->next_row() ) {
-
 			while ( my $cell = $row->next_cell() ) {
 
-				my $row   = $cell->row();
+				my $line  = $cell->row();
 				my $col   = $cell->col();
 				my $value = $cell->value();
 
 				push @{ $got->{$sheetname} },
-				  { row => $row, col => $col, value => $value };
+				  { row => $line, col => $col, value => $value };
 			}
 		}
 		$worksheet->rewind;
 	}
 
 	# Test the results.
-	_is_deep_diff( $got, $expected, $caption );
+	_is_deep_diff( $got, $expected, "($_) $caption" );
 
 }

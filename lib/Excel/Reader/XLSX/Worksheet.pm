@@ -22,6 +22,7 @@ use Excel::Reader::XLSX::Row;
 
 our @ISA     = qw(Excel::Reader::XLSX::Package::XMLreader);
 our $VERSION = '0.00';
+our $USE_CACHE = 1;
 
 ###############################################################################
 #
@@ -45,6 +46,7 @@ sub new {
     $self->{_name}                = shift;
     $self->{_index}               = shift;
     $self->{_previous_row_number} = -1;
+    $self->{row_cache} = [] if $USE_CACHE;
 
     bless $self, $class;
 
@@ -107,6 +109,24 @@ sub get_range{
     return ( $book, ($wantsheet ? $sheet : undef), $row, $cell ) if $wantbook;
 }
 
+
+
+###############################################################################
+#
+# set_row()
+#
+# Set the next available row in the worksheet (only available when $USE_CACHE is true).
+#
+sub set_row{
+    my $self = shift;
+    my $row  = shift // ($self->{_previous_row_number} + 1);
+    die "set_row cannot be called without \$USE_CACHE!" unless $USE_CACHE;
+    die "set_row called with $row but only " . scalar(@{$self->{row_cache}}) . " row cached!" if $row > @{$self->{row_cache}};
+    $self->{_previous_row_number} = $row;
+    $self->{_row} = $self->{row_cache}[$row];
+}
+
+
 ###############################################################################
 #
 # next_row()
@@ -117,6 +137,13 @@ sub next_row {
 
     my $self = shift;
     my $row  = undef;
+
+    if($USE_CACHE and ($self->{_previous_row_number}>=0 or @{$self->{row_cache}}) ){
+        while($self->{_previous_row_number} < @{$self->{row_cache}} -1){
+            my $row_obj = $self->set_row;
+            return $row_obj if ref $row_obj;
+        }
+    }
 
     # Read the next "row" element in the file.
     return unless $self->{_reader}->nextElement( 'row' );
@@ -135,13 +162,17 @@ sub next_row {
         $row_number = $self->{_previous_row_number} + 1;
     }
 
-    if ( !$self->{_row_initialised} ) {
+    if ( !$self->{_row_initialised} or $USE_CACHE ) {
         $self->_init_row();
     }
 
     $row = $self->{_row};
     $row->_init( $row_number );
     $self->{_previous_row_number} = $row_number;
+    
+    if($USE_CACHE){
+        $self->{row_cache}[$row_number]=$row;
+    }
 
     return $row;
 }
@@ -155,7 +186,12 @@ sub next_row {
 sub get_row{
     my ($self, $row_number) = @_;
     die "called with inconsistant row: $row_number" if $row_number < 0;
-    if($row_number < $self->{_previous_row_number}){
+    if($USE_CACHE){
+        if($row_number < @{$self->{row_cache}} - 1){
+            return $self->set_row( $row_number );
+        }
+    }
+    elsif($row_number < $self->{_previous_row_number}){
         $self->rewind;
         $self->{_previous_row_number} = -1;
     }
@@ -200,6 +236,28 @@ sub index {
 # Internal methods.
 #
 ###############################################################################
+
+#Overload of the Rewind the reader to the begining
+##############################################################################
+#
+# rewind()
+#
+# Rewind the reader so it will restart document from the begining.
+# To be true, it build a new one.
+#
+sub rewind{
+    my $self = shift;
+    if($USE_CACHE){
+        $self->{_previous_row_number} = -1;
+        for(@{$self->{row_cache}}){
+            $_->{_next_cell_index} = 0 if ref;
+        }
+        return $self->{_reader};
+    }
+    else{
+        return $self->SUPER::rewind;
+    }
+}
 
 ###############################################################################
 #

@@ -23,7 +23,14 @@
             "row_number" : 5
          }
       ],
-      "Sheet2" : [],
+      "Sheet2" : [
+         {
+            "row_number" : 0
+         },
+         {
+            "row_number" : 6
+         }
+      ],
       "Sheet3" : [
          {
             "row_number" : 0
