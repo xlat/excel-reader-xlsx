@@ -20,6 +20,7 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "excel::reader::xlsx",
   "PREREQ_PM" => {
+    "XML::Simple::Tiny" => 0,   #https://github.com/xlat/XML-Simple-Tiny
     "Archive::Zip" => 0,
     "Carp" => 0,
     "Exporter" => 0,

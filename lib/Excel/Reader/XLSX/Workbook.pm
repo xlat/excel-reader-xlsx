@@ -44,12 +44,14 @@ sub new {
     my $class          = shift;
     my $package_dir    = shift;
     my $shared_strings = shift;
+    my $styles         = shift;
     my %files          = @_;
 
     my $self = Excel::Reader::XLSX::Package::XMLreader->new();
 
     $self->{_package_dir}          = $package_dir;
     $self->{_shared_strings}       = $shared_strings;
+    $self->{_styles}               = $styles;
     $self->{_files}                = \%files;
     $self->{_worksheets}           = undef;
     $self->{_worksheet_properties} = [];
@@ -325,6 +327,7 @@ sub _read_worksheets {
         # Create a new Worksheet reader.
         my $worksheet = Excel::Reader::XLSX::Worksheet->new(
             $self->{_shared_strings},
+            $self->{_styles},
             $sheet->{_name},
             $sheet->{_index},
         );

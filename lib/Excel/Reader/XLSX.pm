@@ -21,7 +21,7 @@ use File::Temp;
 use Excel::Reader::XLSX::Workbook;
 use Excel::Reader::XLSX::Package::ContentTypes;
 use Excel::Reader::XLSX::Package::SharedStrings;
-
+use Excel::Reader::XLSX::Package::Styles;
 
 # Modify Archive::Zip error handling reporting so we can catch errors.
 Archive::Zip::setErrorHandler( sub { die shift } );
@@ -164,14 +164,21 @@ sub read_file {
 
     # Read the sharedStrings if present. Only files with strings have one.
     if ( $files{_shared_strings} ) {
-
         $shared_strings->_parse_file( $tempdir . $files{_shared_strings} );
     }
 
+    # Create a reader object to read the styles.xml file
+    my $styles = Excel::Reader::XLSX::Package::Styles->new();
+    # Read the sharedStrings if present. Only files with strings have one.
+    if ( $files{_styles} ) {
+        $styles->_parse_file( $tempdir . $files{_styles} );
+    }
+    
     # Create a reader object for the workbook.xml file.
     my $workbook = Excel::Reader::XLSX::Workbook->new(
         $tempdir,
         $shared_strings,
+        $styles,
         %files
 
     );

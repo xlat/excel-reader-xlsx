@@ -58,10 +58,12 @@ sub _init {
     my $self = shift;
 
     $self->{_row_number}          = shift;
+    $self->{_styleId}             = shift;
     $self->{_previous_row_number} = $self->{_sheet}->{_previous_row_number};
     $self->{_reader}              = $self->{_sheet}->{_reader};
     $self->{_row_is_empty}        = $self->{_reader}->isEmptyElement();
     $self->{_values}              = undef;
+    $self->{_styles}              = undef;
 
     # TODO. Make the cell initialisation a lazy load.
     # Read the child cell nodes.
@@ -131,6 +133,8 @@ sub _mk_cell{
     my $cell = $self->{_cell};
     $cell->_init();
     $cell->{_range} = $range;
+    $cell->{_styleId} = $cell_node->getAttribute( 's' );
+    
     #ignore book, sheet
     #Must always return one sub_range
     my @sub_ranges = $self->{_sheet}->{_book}->parse_range( $range );

@@ -43,6 +43,7 @@ sub new {
     my $self  = Excel::Reader::XLSX::Package::XMLreader->new();
 
     $self->{_shared_strings}      = shift;
+    $self->{_styles}              = shift;
     $self->{_name}                = shift;
     $self->{_index}               = shift;
     $self->{_previous_row_number} = -1;
@@ -151,6 +152,7 @@ sub next_row {
     # Read the row attributes.
     my $row_reader = $self->{_reader};
     my $row_number = $row_reader->getAttribute( 'r' );
+    my $row_style  = $row_reader->getAttribute( 's' );
 
     # Zero index the row number.
     if ( defined $row_number ) {
@@ -167,7 +169,7 @@ sub next_row {
     }
 
     $row = $self->{_row};
-    $row->_init( $row_number );
+    $row->_init( $row_number, $row_style );
     $self->{_previous_row_number} = $row_number;
     
     if($USE_CACHE){

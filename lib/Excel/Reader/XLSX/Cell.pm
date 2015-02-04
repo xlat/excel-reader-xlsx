@@ -58,6 +58,9 @@ sub _init {
     $self->{_value}            = '';
     $self->{_converted_string} = 0;
     $self->{_has_formula}      = 0;
+    $self->{_styles}           = undef;
+    $self->{_styleId}          = undef;
+    
 }
 
 
@@ -159,6 +162,17 @@ sub get_hyperlink{
         }
     }
     return undef;
+}
+
+sub styles{
+    
+    my $self = shift;
+
+    #FIXME: take in account row->{_styleId} as a parent style to inherit from (if any).
+    $DB::single = 1 if $self->range eq 'B1';
+    $self->{_styles} //= $self->{_sheet}{_styles}->get_style($self->{_styleId});
+    
+    return $self->{_styles};
 }
 
 1;
