@@ -175,6 +175,47 @@ sub styles{
     return $self->{_styles};
 }
 
+#styles specific methods
+sub color{
+
+    my $self = shift;
+    
+    my $colors = $self->styles->{font}{color};
+
+    return $self->{_sheet}{_styles}->get_color_as_rgb( $colors );
+}
+
+sub bgcolor{
+
+    my $self = shift;
+    
+    #should be a patternType="solid"
+    my $colors = $self->styles->{fill}{patternFill}{fgColor};
+
+    return $self->{_sheet}{_styles}->get_color_as_rgb( $colors );
+}
+
+sub is_bold{
+    
+    my $self = shift;
+    
+    return exists $self->styles->{font}{b};
+}
+
+sub is_italic{
+    
+    my $self = shift;
+    
+    return exists $self->styles->{font}{i};
+}
+
+sub is_underline{
+    
+    my $self = shift;
+    
+    return exists $self->styles->{font}{u};
+}
+
 1;
 
 

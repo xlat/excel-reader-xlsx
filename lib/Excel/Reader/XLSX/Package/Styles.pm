@@ -149,61 +149,33 @@ sub get_indexed_color{
 
 sub get_theme_color{
     
-    my $self  = shift;
-    my $theme = shift;
+    my $self        = shift;
+    my $theme_index = shift;
 
-    #TODO: need to parse theme1.xml (or theme[x].xml)
-    
-    return "FF000000";
+    #TODO: need to parse theme1.xml (or theme[x].xml) 
+    #               for theme/themeElements/clrScheme/*/sysClr,srgbClr
+    #Currently, it comes from default values with default [windows] theme.
+    my @themes = (
+        "FF000000", "FFFFFFFF", "FF1F497D", "FFEEECE1", 
+        "FF4F81BD", "FFC0504D", "FF9BBB59", "FF8064A2", 
+        "FF4BACC6", "FFF79646", "FF0000FF", "FF800080", 
+    );
+        
+    return $themes[$theme_index] // "FF000000";
 }
 
-sub apply_tint_color{
+sub get_color_as_rgb{
     
-    my $self  = shift;
-    my $color = shift;
-    my $tint  = shift;
-
-    #TODO
-=pod
-The tint value is stored as a double from -1.0 .. 1.0, where -1.0 means 100% darken and 
-1.0 means 100% lighten. Also, 0.0 means no change. 
- 
-In loading the RGB value, it is converted to HLS where HLS values are (0..HLSMAX), where 
-HLSMAX is currently 255. 
- 
-[Example:  
- 
-Here are some examples of how to apply tint to color: 
- 
-If (tint < 0) 
-  Lum’ = Lum * (1.0 + tint) 
- 
-For example: Lum = 200; tint = -0.5; Darken 50% 
-  Lum‘ = 200 * (0.5) => 100 
- 
-For example:  Lum = 200; tint = -1.0; Darken 100% (make black) 
-
-Attributes  Description 
-  Lum‘ = 200 * (1.0-1.0) => 0 
- 
-If (tint > 0) 
-  Lum‘ = Lum * (1.0-tint) + (HLSMAX – HLSMAX * (1.0-tint)) 
- 
-For example: Lum = 100; tint = 0.75; Lighten 75% 
-Lum‘      = 100 * (1-.75)  + (HLSMAX – HLSMAX*(1-.75)) 
-                = 100 * .25 + (255 – 255 * .25) 
-                = 25 + (255 – 63) = 25 + 192 = 217 
- 
-For example: Lum = 100; tint = 1.0; Lighten 100% (make white) 
-Lum‘      = 100 * (1-1)  + (HLSMAX – HLSMAX*(1-1)) 
-                = 100 * 0 + (255 – 255 * 0) 
-                = 0 + (255 – 0) = 255 
- 
-end example] 
-=cut
+    my $self   = shift;
+    my $colors = shift;
+    my $color;
+    
+    $color = $colors->{rgb} if exists $colors->{rgb};
+    $color = $self->get_indexed_color($colors->{indexed}) if exists $colors->{indexed};
+    $color = $self->get_theme_color($colors->{theme}) if exists $colors->{theme};
+    $color = apply_tint_to_argb($colors->{tint}, $color) if exists $colors->{tint};
     
     return $color;
-    
 }
 
 ##############################################################################
@@ -240,6 +212,137 @@ sub _read_node {
         $self->{_xfparent} = $tag;
     }
     
+}
+
+################ 
+# TODO: move the coloration functions into a specific module like Excel::Reader::XLSX::Colors or Color::HSL
+use List::Util qw( min max );
+use Math::Round qw( round );
+
+sub rgb_to_hex{
+    my @rgb  = (shift, shift, shift);
+    my %opts = @_;
+    unshift @rgb, $opts{argb} if exists $opts{argb};
+    my $hex;
+    $hex = '#' if $opts{html};
+    $hex .= sprintf('%02X', $_) for @rgb;
+    return $hex;
+}
+sub hex_to_rgb{
+    my $argb = shift;
+    
+    if($argb =~ /^(?:#|..|&[hH]|0[xX])?(..)(..)(..)$/){
+        return map{ hex_to_dec($_) } ($1, $2, $3);
+    }
+    
+    return (0, 0, 0);
+}
+
+sub hex_to_dec{
+    my $hex     = uc shift;
+    
+    my $v       = 0;
+    my @hdigits = split //, $hex;
+    for(@hdigits){
+        $v *= 16;
+        $v += index('0123456789ABCDEF',$_);
+    }
+    
+    return $v;
+}
+sub rgb_to_hsl{
+    my ($R, $G, $B) = map { $_ / 255 } @_;
+    
+    my ($H, $S, $L) = (0, 0, 0);
+    my $Cmax = max( $R, $G, $B );
+    my $Cmin = min( $R, $G, $B );
+    my $delta= $Cmax - $Cmin;
+    $L = ($Cmax + $Cmin) / 2;
+    if($delta){
+        if($Cmax == $R){
+            $H = 60 * ((($G - $B)/$delta) % 6);
+        }
+        elsif($Cmax == $G){
+            $H = 60 * (($B - $R)/$delta + 2);
+        }
+        else{
+            $H = 60 * (($R - $G)/$delta + 4);
+        }
+        my $l = 1/3*($R + $G + $B);
+        $S = 1 - $Cmin / $l;
+    }
+    $H = round( $H/360 * 255 );
+    $S = round( $S * 255 );
+    $L = round( $L * 255 );
+    
+    return ($H, $S, $L);
+}
+sub hsl_to_rgb{
+    my ($H, $S, $L) = @_;
+    my ($R, $G, $B) = (0, 0, 0);
+    
+    $H = $H * 360 / 255;
+    $S = $S / 255;
+    $L = $L / 255;
+
+    my $C = (1 - abs( 2* $L - 1) ) * $S;
+    $H /= 60;
+    my $X = $C * ( 1 - abs( ( $H % 2 ) - 1 ) );
+    my $m = $L - $C/2;
+    # ($R, $G, $B) =  (0, 0, 0) if $H is undefined !
+    if($H >=0 and $H < 1){
+        ($R, $G, $B) = ( $C, $X, 0);
+    }
+    elsif($H >=1 and $H <2){
+        ($R, $G, $B) = ( $X, $C, 0);
+    }
+    elsif($H >=2 and $H <3){
+        ($R, $G, $B) = ( 0, $C, $X);
+    }
+    elsif($H >=3 and $H <4){
+        ($R, $G, $B) = ( 0, $X, $C);
+    }
+    elsif($H >=4 and $H <5){
+        ($R, $G, $B) = ( $X, 0, $C);
+    }
+    else{
+        ($R, $G, $B) = ( $C, 0, $X);
+    }
+
+    $_ += $m for ($R, $G, $B);
+    $_ = round($_ * 255) for ($R, $G, $B);
+    
+    return ($R, $G, $B);
+}
+sub apply_tint_to_hsl{
+    my $tint = 1 + shift;
+    my ($H, $S, $L)  = @_;
+    
+    $L = round(
+            $tint<0
+            ?   $L*(1+$tint) 
+            :   $L*(1-$tint)+(255-255*(1-$tint))
+        );
+        
+    return ($H, $S, $L);
+}
+sub apply_tint_to_rgb{
+    my $tint = shift;
+    my @rgb = @_;
+    my @hsl  = rgb_to_hsl(@rgb);
+    @hsl     = apply_tint_to_hsl( $tint, @hsl );
+    @rgb     = hsl_to_rgb( @hsl );
+    return @rgb;
+}
+sub apply_tint_to_argb{
+    my $tint = shift;
+    my $argb = shift;
+    
+    my @rgb  = hex_to_rgb($argb);
+    @rgb     = apply_tint_to_rgb( $tint, @rgb);
+    $argb    = rgb_to_hex(@rgb, argb => 255);
+    
+    return $argb;
 }
 
 1;

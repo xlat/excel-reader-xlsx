@@ -1,0 +1,76 @@
+{
+   "caption"     : "Test styles reading.",
+   "description" : "Simple test of reading styles from a Libre Office file.",
+   "xlsx_file"   : "styles02.xlsx",
+   "expected" : {
+       "Sheet1" : 
+       [
+         {
+            "value" : "green",
+            "styles" : {
+               "color" : "FF00B050",
+               "bgcolor" : null,
+               "underline" : "",
+               "bold" : "",
+               "italic" : ""
+            },
+            "range" : "A1"
+         },
+         {
+            "value" : "bold",
+            "styles" : {
+               "color" : "FFFFFFFF",
+               "bgcolor" : null,
+               "underline" : "",
+               "bold" : 1,
+               "italic" : ""
+            },
+            "range" : "A2"
+         },
+         {
+            "value" : "italic",
+            "styles" : {
+               "color" : "FFFFFFFF",
+               "bgcolor" : null,
+               "underline" : "",
+               "bold" : "",
+               "italic" : 1
+            },
+            "range" : "A3"
+         },
+         {
+            "value" : "underline",
+            "styles" : {
+               "color" : "FFFFFFFF",
+               "bgcolor" : null,
+               "underline" : 1,
+               "bold" : "",
+               "italic" : ""
+            },
+            "range" : "A4"
+         },
+         {
+            "value" : "bg grayed",
+            "styles" : {
+               "color" : "FFFFFFFF",
+               "bgcolor" : "FFBFBFBF",
+               "underline" : "",
+               "bold" : "",
+               "italic" : ""
+            },
+            "range" : "A5"
+         },
+         {
+            "value" : "bg darker",
+            "styles" : {
+               "color" : "FFFFFFFF",
+               "bgcolor" : "FF808080",
+               "underline" : "",
+               "bold" : "",
+               "italic" : ""
+            },
+            "range" : "A6"
+         }
+      ]
+    }
+}
