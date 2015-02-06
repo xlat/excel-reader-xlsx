@@ -58,6 +58,7 @@ sub _init {
     $self->{_value}            = '';
     $self->{_converted_string} = 0;
     $self->{_has_formula}      = 0;
+    $self->{_formula}          = undef;
     $self->{_styles}           = undef;
     $self->{_styleId}          = undef;
     
@@ -148,7 +149,15 @@ sub formula{
     
     my $self = shift;
     
-    return $self->{_formula} if $self->{_has_formula};
+    return $self->{_formula};
+}
+
+
+sub has_formula{
+    
+    my $self = shift;
+    
+    return $self->{_has_formula};
 }
 
 sub get_hyperlink{
