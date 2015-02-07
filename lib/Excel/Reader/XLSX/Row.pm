@@ -143,6 +143,7 @@ sub _mk_cell{
     my $type = $cell_node->getAttribute( 't' );
     $cell->{_type} = $type || '';
     # Read the cell <c> child nodes.
+	CHILD:
     for my $child_node ( $cell_node->childNodes() ) {
         my $node_name = $child_node->nodeName();
         if ( $node_name eq 'v' ) {
@@ -157,6 +158,22 @@ sub _mk_cell{
         elsif ( $node_name eq 'f' ) {
             $cell->{_formula}     = $child_node->textContent();
             $cell->{_has_formula} = 1;
+			if(my $type = $child_node->getAttribute('t')){
+				next CHILD unless $type eq 'shared';
+				my $si 	= $child_node->getAttribute('si');
+				my $ref = $child_node->getAttribute('ref');
+				$cell->{_formula_si} = $si;
+				if(defined $ref){
+					$self->{_sheet}{_sharedformula}[$si]={ 
+						src		=> $range,
+						'ref'	=> $ref,
+						f 			=> $cell->{_formula},
+					};
+				}
+				else{
+					$cell->{_formula} = $self->{_sheet}->transpose_shared_formula($si, $cell);
+				}
+			}
         }
     }
     return $cell;

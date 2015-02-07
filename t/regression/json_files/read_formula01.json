@@ -1,0 +1,152 @@
+{
+   "caption"     : "Test styles reading.",
+   "description" : "Simple test of reading shared formula from a Libre Office file.",
+   "xlsx_file"   : "formulashared.xlsx",
+   "expected" : {
+       "Sheet1" : 
+       [
+			{
+			   "formula" : "MOD(A1,3)",
+			   "range" : "B1"
+			},
+			{
+			   "formula" : "MOD(B1,3)",
+			   "range" : "C1"
+			},
+			{
+			   "range" : "D1",
+			   "formula" : "42+$A1-B$1+$C$1*A10"
+			},
+			{
+			   "range" : "E1",
+			   "formula" : "42+$A1-C$1+$C$1*B10"
+			},
+			{
+			   "formula" : "42+$A1-D$1+$C$1*C10",
+			   "range" : "F1"
+			},
+			{
+			   "range" : "B2",
+			   "formula" : "MOD(A2,3)"
+			},
+			{
+			   "range" : "C2",
+			   "formula" : "MOD(B2,3)"
+			},
+			{
+			   "range" : "D2",
+			   "formula" : "42+$A2-B$1+$C$1*A11"
+			},
+			{
+			   "range" : "B3",
+			   "formula" : "MOD(A3,3)"
+			},
+			{
+			   "range" : "C3",
+			   "formula" : "MOD(B3,3)"
+			},
+			{
+			   "range" : "D3",
+			   "formula" : "42+$A3-B$1+$C$1*A12"
+			},
+			{
+			   "range" : "B4",
+			   "formula" : "MOD(A4,3)"
+			},
+			{
+			   "formula" : "MOD(B4,3)",
+			   "range" : "C4"
+			},
+			{
+			   "range" : "D4",
+			   "formula" : "42+$A4-B$1+$C$1*A13"
+			},
+			{
+			   "formula" : "MOD(A5,3)",
+			   "range" : "B5"
+			},
+			{
+			   "range" : "C5",
+			   "formula" : "MOD(B5,3)"
+			},
+			{
+			   "formula" : "42+$A5-B$1+$C$1*A14",
+			   "range" : "D5"
+			},
+			{
+			   "formula" : "MOD(A6,3)",
+			   "range" : "B6"
+			},
+			{
+			   "formula" : "MOD(B6,3)",
+			   "range" : "C6"
+			},
+			{
+			   "formula" : "42+$A6-B$1+$C$1*A15",
+			   "range" : "D6"
+			},
+			{
+			   "formula" : "MOD(A7,3)",
+			   "range" : "B7"
+			},
+			{
+			   "formula" : "MOD(B7,3)",
+			   "range" : "C7"
+			},
+			{
+			   "range" : "D7",
+			   "formula" : "42+$A7-B$1+$C$1*A16"
+			},
+			{
+			   "range" : "B8",
+			   "formula" : "MOD(A8,3)"
+			},
+			{
+			   "range" : "C8",
+			   "formula" : "MOD(B8,3)"
+			},
+			{
+			   "range" : "D8",
+			   "formula" : "42+$A8-B$1+$C$1*A17"
+			},
+			{
+			   "formula" : "MOD(A9,3)",
+			   "range" : "B9"
+			},
+			{
+			   "formula" : "MOD(B9,3)",
+			   "range" : "C9"
+			},
+			{
+			   "range" : "D9",
+			   "formula" : "42+$A9-B$1+$C$1*A18"
+			},
+			{
+			   "range" : "B10",
+			   "formula" : "MOD(A10,3)"
+			},
+			{
+			   "range" : "C10",
+			   "formula" : "MOD(B10,3)"
+			},
+			{
+			   "range" : "D10",
+			   "formula" : "42+$A10-B$1+$C$1*A19"
+			},
+			{
+			   "formula" : "MOD(A11,3)",
+			   "range" : "B11"
+			},
+			{
+			   "formula" : "MOD(B11,3)",
+			   "range" : "C11"
+			},
+			{
+			   "formula" : "42+$A11-B$1+$C$1*A20",
+			   "range" : "D11"
+			}
+      ],
+		"Sheet2" : [ ],
+		"Sheet3" : [ ]
+    }
+}

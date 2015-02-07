@@ -311,6 +311,47 @@ sub _init_link{
         }
         $self->{_links} = \%links;
 }
+
+sub transpose_shared_formula{
+	
+	my $self = shift;
+	my $si = shift;
+	my $cell = shift;
+	
+	my $shared_formula = $self->{_sharedformula}[$si];
+	my $formula = $shared_formula->{f};
+	my ($src_row, $src_col) = Excel::Reader::XLSX::Workbook::_range_to_rowcol($shared_formula->{src});
+	my $d_row	= $cell->row - $src_row;
+	my $d_col	= $cell->col - $src_col;
+	
+	#find all CELL reference that are translatable in formula.
+	my $transposed = $formula;
+	#avoid to match function like LOG1( ) as a cell reference.
+	#avoid text string such as in: =B1 & "A1"; to be patched.
+	#	To find double-quoted strings in formula so we can ignore match inside them.
+	#	Build a new string where non string chars are '0' and string chars are all '1' so 
+	#	we could quickly know if a match is inside a string.
+	my $ignore_match_map = join '', 
+										map{ (/^"/ ? '1' : '0') x length } 
+										split /("[^"]*")/, $formula;
+	my @tr;
+	CELL_REF:
+	while($formula =~ /\b([A-Z]+)(\$?)(\d+)\b(?![(])/g){
+		my ($c, $rlock, $r, $i, $len) = ($1, $2, $3, $-[0], $+[0] -$-[0]);
+		my $clock = $i ? substr($formula, $i - 1,1) eq '$' : 0;
+		next CELL_REF if ($rlock and $clock) 
+								or substr($ignore_match_map,$i,1);
+		my ($row, $col) = Excel::Reader::XLSX::Workbook::_range_to_rowcol( $c.$r );
+		$row += $d_row unless $rlock;
+		$col += $d_col unless $clock;
+		my $range = Excel::Reader::XLSX::Workbook::_rowcol_to_range( $row, $col, $rlock, $clock );
+		#patch range, in a reverse order
+		unshift @tr, sub{ substr($_[0], $i, $len)=$range };
+	}
+	$_->($transposed) for @tr;
+	return $transposed;
+}
+
 ###############################################################################
 #
 # _init( $workbook, $sheetprops )

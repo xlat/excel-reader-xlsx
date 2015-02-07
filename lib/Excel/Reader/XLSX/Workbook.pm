@@ -287,9 +287,9 @@ sub _range_to_rowcol {
 }
 
 sub _rowcol_to_range {
-    my ($row, $col) = @_;
+    my ($row, $col, $rlock, $clock) = @_;
     my $range;
-    
+    $range = '$' if $clock;
     if( $col > 26 ){
         if($col > 701){
             $range = chr( int(int(($col / 26) / 26) + 64) ). 
@@ -303,7 +303,7 @@ sub _rowcol_to_range {
     else{
         $range = chr( $col + 65 );
     }
-    
+    $range .= '$' if $rlock;    
     $range .= $row + 1;
     return $range;
 }
