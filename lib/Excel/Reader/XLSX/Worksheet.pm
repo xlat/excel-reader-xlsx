@@ -359,20 +359,41 @@ sub resolve_external_workbook{
 	my $ignore_match_map = join '', 
 										map{ (/^"/ ? '1' : '0') x length } 
 										split /("[^"]*")/, $formula;
+
+	my $rx_ext_wb = qr/
+		(?<quote>'\[)(?<wb>\d+)\](?<ws>(?:[^']||'')+)'!
+	|	\[(?<wb>\d+)\](?<ws>[^'!]*)!
+		/x;
 	my @tr;
 	EXTERNAL_WB:
-	while($formula =~ /\[(\d+)\]([^!]+)!/g){
-		my ($extId, $sheet, $i, $len) = ($1,  $2, $-[0], $+[0] - $-[0]);
+	while($formula =~ /$rx_ext_wb/g){
+		my ($quote, $extId, $sheet, $i, $len) = ($+{quote}, $+{wb}, $+{ws}, $-[0], $+[0] - $-[0]);
 		next EXTERNAL_WB if substr($ignore_match_map,$i, 1);
-		$DB::single = 1;
+		$sheet//='';#names ref doesn't have sheet name, so avoid undef.
 		my $wbref = $self->{_book}->get_external_target($extId - 1);
-		$wbref = "[$wbref]$sheet!"
-			unless $wbref =~ s{^(.*)/([^/]+)$}{'$1/[$2]$sheet'!};
+		unless($wbref =~ s{^(.*)/([^/]+)$}{'$1/[$2]$sheet'!}){
+			if($quote){
+				$wbref = "'[$wbref]$sheet'!";
+			}
+			else{
+				$wbref = "[$wbref]$sheet!";
+			}
+		}
 		$wbref =~ tr{/}{\\};
 		unshift @tr, sub{ substr($_[0], $i, $len)=$wbref };
 	}
 	$_->($formula) for @tr;
 	
+=pod
+
+	[1]Sheet1!$C$3 							=> [data01.xlsx]Sheet1!$C$3
+	'[2]Sheet With Spaces'!$A$1			=> 'externals\[external01.xlsx]Sheet1'!$A$1
+	'[2]Sheet''s "nam({e})!"'!$A$1	=> 'externals\[external01.xlsx]Sheet''s "nam({e})!"'!$A$1
+	
+	[2]!EXTNAME1		=> 'externals\[external01.xlsx]Sheet'!$A$1
+	[2]!NAMED			=> 'externals\[external01.xlsx]Sheet With Spaces'!$A$2
+
+=cut	
 	return $formula;
 }
 

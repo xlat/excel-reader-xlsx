@@ -146,12 +146,28 @@
 			   "range" : "D11"
 			},
 			{
-			  "formula" : "A1+42+[data01.xlsx]Sheet1!$C$3",
-			  "range" : "A13"
+			   "formula" : "A1+42+[data01.xlsx]Sheet1!$C$3",
+			   "range" : "A13"
 			},
 			{
-			  "formula" : "B1+42+'externals\\[external01.xlsx]Sheet1'!$A$1",
-			  "range" : "B13"
+			   "formula" : "B1+42+'externals\\[external01.xlsx]Sheet1'!$A$1",
+			   "range" : "B13"
+			},
+			{
+			   "formula" : "\"TEST(\" & 'externals\\[external01.xlsx]'!EXTNAME1& \")\"",
+			   "range" : "C13"
+			},
+			{
+			   "formula" : "'externals\\[external01.xlsx]Sheet With Spaces'!$A$1",
+			   "range" : "B14"
+			},
+			{
+			   "formula" : "'externals\\[external01.xlsx]'!NAMED",
+			   "range" : "C14"
+			},
+			{
+			   "range" : "D14",
+			   "formula" : "'externals\\[external01.xlsx]Sheet''s \"nam({e})!\"'!$A$1"
 			}
       ],
 		"Sheet2" : [ ],
