@@ -325,7 +325,6 @@ sub transpose_shared_formula{
 	my $d_col	= $cell->col - $src_col;
 	
 	#find all CELL reference that are translatable in formula.
-	my $transposed = $formula;
 	#avoid to match function like LOG1( ) as a cell reference.
 	#avoid text string such as in: =B1 & "A1"; to be patched.
 	#	To find double-quoted strings in formula so we can ignore match inside them.
@@ -348,8 +347,33 @@ sub transpose_shared_formula{
 		#patch range, in a reverse order
 		unshift @tr, sub{ substr($_[0], $i, $len)=$range };
 	}
-	$_->($transposed) for @tr;
-	return $transposed;
+	$_->($formula) for @tr;
+	
+	return $formula;
+}
+
+sub resolve_external_workbook{
+	my $self = shift;
+	my $formula = shift;
+	
+	my $ignore_match_map = join '', 
+										map{ (/^"/ ? '1' : '0') x length } 
+										split /("[^"]*")/, $formula;
+	my @tr;
+	EXTERNAL_WB:
+	while($formula =~ /\[(\d+)\]([^!]+)!/g){
+		my ($extId, $sheet, $i, $len) = ($1,  $2, $-[0], $+[0] - $-[0]);
+		next EXTERNAL_WB if substr($ignore_match_map,$i, 1);
+		$DB::single = 1;
+		my $wbref = $self->{_book}->get_external_target($extId - 1);
+		$wbref = "[$wbref]$sheet!"
+			unless $wbref =~ s{^(.*)/([^/]+)$}{'$1/[$2]$sheet'!};
+		$wbref =~ tr{/}{\\};
+		unshift @tr, sub{ substr($_[0], $i, $len)=$wbref };
+	}
+	$_->($formula) for @tr;
+	
+	return $formula;
 }
 
 ###############################################################################

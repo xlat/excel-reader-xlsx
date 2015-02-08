@@ -144,6 +144,14 @@
 			{
 			   "formula" : "42+$A11-B$1+$C$1*A20",
 			   "range" : "D11"
+			},
+			{
+			  "formula" : "A1+42+[data01.xlsx]Sheet1!$C$3",
+			  "range" : "A13"
+			},
+			{
+			  "formula" : "B1+42+'externals\\[external01.xlsx]Sheet1'!$A$1",
+			  "range" : "B13"
 			}
       ],
 		"Sheet2" : [ ],

@@ -344,6 +344,47 @@ sub _read_worksheets {
 }
 
 
+sub _read_externals{
+	
+	my $self = shift;
+	
+	$self->{_externals} = [];
+	return unless exists $self->{_files}{_externals};
+	for(0..@{ $self->{_files}{_externals} }){
+		$self->{_externals}[$_] = {
+				file_name => $self->{_files}{_externals}[$_]
+			};
+	}
+	
+	#TODO: add a Package/External.pm for parsing External's file
+	my $id = 0;
+	REL:
+	for my $rel (@{ $self->{_files}{_externals_rels} }){
+		#parsing external's rels
+		my $rels_file = Excel::Reader::XLSX::Package::Relationship->new();
+		$rels_file->_parse_file( $self->{_package_dir} . $rel );
+		my %rels = $rels_file->_get_relationships();
+		$self->{_externals}[$id ++]{rels}= \%rels;
+	}
+
+}
+
+sub get_external{
+	
+	my $self = shift;
+	my $id = shift;
+	
+	$self->_read_externals unless $self->{_externals};
+	
+	return $self->{_externals}[$id];
+}
+
+sub get_external_target{
+	my $self = shift;
+	my $id = shift;
+	
+	return $self->get_external($id)->{rels}{rId1}{_target};
+}
 
 1;
 

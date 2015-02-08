@@ -156,7 +156,7 @@ sub _mk_cell{
             $cell->{_has_value} = 1;
         }
         elsif ( $node_name eq 'f' ) {
-            $cell->{_formula}     = $child_node->textContent();
+            $cell->{_formula}     = $self->{_sheet}->resolve_external_workbook($child_node->textContent());
             $cell->{_has_formula} = 1;
 			if(my $type = $child_node->getAttribute('t')){
 				next CHILD unless $type eq 'shared';

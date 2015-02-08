@@ -103,6 +103,20 @@ sub _read_node {
         push @{ $self->{_files}->{_worksheets} }, $part_name;
         return;
     }
+	
+    if ( $part_name =~ /externalLink\d+\.xml$/ ) {
+		my $external_rels = $part_name;
+		$external_rels =~ s{(externalLink\d+\.xml)}{_rels/$1.rels};
+        push @{ $self->{_files}->{_externals} }, $part_name;
+        push @{ $self->{_files}->{_externals_rels} }, $external_rels;
+        return;
+    }
+
+    if ( $part_name =~ /theme\d+\.xml$/ ) {
+        push @{ $self->{_files}->{_themes} }, $part_name;
+        return;
+    }
+
 }
 
 
