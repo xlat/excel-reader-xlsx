@@ -176,7 +176,8 @@ sub read_file {
     
     # Create a reader object for the workbook.xml file.
     my $workbook = Excel::Reader::XLSX::Workbook->new(
-        $tempdir,
+        $filename,
+		$tempdir,
         $shared_strings,
         $styles,
         %files

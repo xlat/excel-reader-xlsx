@@ -45,7 +45,8 @@ $expected = {
 
     ],
     '_core'           => 'docProps/core.xml',
-    '_shared_strings' => 'xl/sharedStrings.xml'
+    '_shared_strings' => 'xl/sharedStrings.xml',
+	'_themes' => [  'xl/theme/theme1.xml' ],
 };
 
 

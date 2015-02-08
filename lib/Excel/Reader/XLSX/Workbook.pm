@@ -42,6 +42,7 @@ our $VERSION = '0.00';
 sub new {
 
     my $class          = shift;
+	my $fullname = shift;
     my $package_dir    = shift;
     my $shared_strings = shift;
     my $styles         = shift;
@@ -49,6 +50,9 @@ sub new {
 
     my $self = Excel::Reader::XLSX::Package::XMLreader->new();
 
+    $self->{_fullname}          = $fullname;
+    $self->{_name}          = $fullname;
+	$self->{_name} =~ s{.*[/\\]}{}g;
     $self->{_package_dir}          = $package_dir;
     $self->{_shared_strings}       = $shared_strings;
     $self->{_styles}               = $styles;
@@ -386,6 +390,19 @@ sub get_external_target{
 	return $self->get_external($id)->{rels}{rId1}{_target};
 }
 
+sub name{
+	
+	my $self =shift;
+	
+	return $self->{_name};
+}
+
+sub fullname{
+	
+	my $self =shift;
+	
+	return $self->{_fullname};
+}
 1;
 
 
