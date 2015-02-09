@@ -312,6 +312,20 @@ sub _init_link{
         $self->{_links} = \%links;
 }
 
+#~ sub find_shared_formula{
+	#~ my $self = shift;
+	#~ my $si = shift;
+	#~ (my $clone = $sheet->clone)->rewind;
+	#~ ROW:
+	#~ while(my $row = $clone->net_row){
+		#~ CELL:
+		#~ while(my $cell = $row->next_cell){
+			#~ last ROW if defined $self->{_sheet}{_sharedformula}[$si];
+		#~ }
+	#~ }
+	#~ return $self->{_sheet}{_sharedformula}[$si]; # or die "shared formua without source (si=$si)!";
+#~ }
+
 sub transpose_shared_formula{
 	
 	my $self = shift;

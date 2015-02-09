@@ -110,6 +110,22 @@
 			   "formula" : "42+$A8-B$1+$C$1*A17"
 			},
 			{
+			  "formula" : "Y6+Y7",
+			  "range" : "Y8"
+			},
+			{
+			  "formula" : "Z6+Z7",
+			  "range" : "Z8"
+			},
+			{
+			  "formula" : "AA6+AA7",
+			  "range" : "AA8"
+			},
+			{
+			  "formula" : "AB6+AB7",
+			  "range" : "AB8"
+			},
+			{
 			   "formula" : "MOD(A9,3)",
 			   "range" : "B9"
 			},
@@ -169,7 +185,7 @@
 			   "range" : "D14",
 			   "formula" : "'externals\\[external01.xlsx]Sheet''s \"nam({e})!\"'!$A$1"
 			}
-      ],
+		],
 		"Sheet2" : [ ],
 		"Sheet3" : [ ]
     }
