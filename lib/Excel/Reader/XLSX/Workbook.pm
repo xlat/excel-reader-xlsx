@@ -206,12 +206,12 @@ sub worksheet {
 sub parse_range{
     my ($self, $range) = @_;
     my ($book, $sheet, $row, $col) = (undef, undef, undef, undef);
-    if($range =~ /^\[(?<book>[^\]]+)\](?<sheet>[^!]+)!(?<range>.*)/){
+    if($range =~ /^\[(?<book>[^\]]+)\](?<sheet>[^!]+)!(?<range>.*)/o){
         $book = $+{book};
         $sheet = $+{sheet};
         $range = $+{range};
     }
-    elsif($range =~ /^(?<book>[^.]+\.[^!]+)!(?<range>.+)/){
+    elsif($range =~ /^(?<book>[^.]+\.[^!]+)!(?<range>.+)/o){
         $book = $+{book};
         $range = $+{range};
     }
@@ -223,15 +223,15 @@ resolve_names:
             #this new $range can contain an Sheet! prefix
             return if $range eq '#REF!';
         }
-        if($range =~ /^(?<sheet>[^!]+)!(?<range>.+)/){
+        if($range =~ /^(?<sheet>[^!]+)!(?<range>.+)/o){
             $sheet = $+{sheet} if exists $+{sheet};
             $range = $+{range};
         }
-    }while( $range =~ /!/ or exists $self->{_names}->{uc $range});
-    $sheet =~ s/'//g if defined $sheet;
+    }while( index($range,'!')>=0 or exists $self->{_names}->{uc $range});
+    $sheet =~ s/'//go if defined $sheet;
     my @refs;
-    foreach $range ( split /[,;]/, $range ){
-        if($range =~/^([^:]+):(.*)$/){
+    foreach $range ( split /[,;]/o, $range ){
+        if($range =~/^([^:]+):(.*)$/o){
             my ($start, $end) = split ':', $range;
             my ($start_row, $start_col) = _range_to_rowcol( $start );
             my ($end_row,   $end_col)   = _range_to_rowcol( $end );
@@ -244,7 +244,7 @@ resolve_names:
         }
         else{
             ($row, $col) = _range_to_rowcol( $range );
-            $range =~ s/\$//g;
+            $range =~ s/\$//go;
             push @refs, [$book, $sheet, $row, $col, $range];
         }
     }
@@ -262,6 +262,8 @@ resolve_names:
 #
 # Convert an Excel A1 style ref to a zero indexed row and column.
 #
+use Memoize;
+memoize('_range_to_rowcol');
 sub _range_to_rowcol {
     my $range = shift or return;
     $range =~s/\$//g;
@@ -290,6 +292,7 @@ sub _range_to_rowcol {
     return $row, $col;
 }
 
+memoize('_rowcol_to_range');
 sub _rowcol_to_range {
     my ($row, $col, $rlock, $clock) = @_;
     my $range;

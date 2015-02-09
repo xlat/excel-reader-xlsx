@@ -345,11 +345,11 @@ sub transpose_shared_formula{
 	#	Build a new string where non string chars are '0' and string chars are all '1' so 
 	#	we could quickly know if a match is inside a string.
 	my $ignore_match_map = join '', 
-										map{ (/^"/ ? '1' : '0') x length } 
-										split /("[^"]*")/, $formula;
+										map{ (/^"/o ? '1' : '0') x length } 
+										split /("[^"]*")/o, $formula;
 	my @tr;
 	CELL_REF:
-	while($formula =~ /\b([A-Z]+)(\$?)(\d+)\b(?![(])/g){
+	while($formula =~ /\b([A-Z]+)(\$?)(\d+)\b(?![(])/go){
 		my ($c, $rlock, $r, $i, $len) = ($1, $2, $3, $-[0], $+[0] -$-[0]);
 		my $clock = $i ? substr($formula, $i - 1,1) eq '$' : 0;
 		next CELL_REF if ($rlock and $clock) 
