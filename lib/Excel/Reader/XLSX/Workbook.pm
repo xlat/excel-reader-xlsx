@@ -262,10 +262,11 @@ resolve_names:
 #
 # Convert an Excel A1 style ref to a zero indexed row and column.
 #
-use Memoize;
-memoize('_range_to_rowcol');
+
+my %memoize = (_range_to_rowcol => {}, _rowcol_to_range => {});
 sub _range_to_rowcol {
     my $range = shift or return;
+    return @{$memoize{_range_to_rowcol}{$range}} if exists $memoize{_range_to_rowcol}{$range};
     $range =~s/\$//g;
     my ( $col, $row ) = split /(\d+)/, $range;
     return unless defined $row;
@@ -289,11 +290,13 @@ sub _range_to_rowcol {
           676 * ord( $chars[0] );
     }
 
+    $memoize{_range_to_rowcol}{$range}=[$row, $col];
     return $row, $col;
 }
 
-memoize('_rowcol_to_range');
 sub _rowcol_to_range {
+    my $key = join ':', map{ $_ // ''} @_;
+    return $memoize{_rowcol_to_range}{$key} if exists $memoize{_rowcol_to_range}{$key};
     my ($row, $col, $rlock, $clock) = @_;
     my $range;
     $range = '$' if $clock;
@@ -313,6 +316,8 @@ sub _rowcol_to_range {
     }
     $range .= '$' if $rlock;    
     $range .= $row + 1;
+    
+    $memoize{_rowcol_to_range}{$key} = $range;
     return $range;
 }
 
