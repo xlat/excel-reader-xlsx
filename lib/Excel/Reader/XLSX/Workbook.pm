@@ -114,6 +114,7 @@ sub _read_node {
         my	$name     = $node->getAttribute( 'name' );
         my	$sheet_id = $node->getAttribute( 'sheetId' );
         my	$rel_id   = $node->getAttribute( 'r:id' );
+        my	$state   = $node->getAttribute( 'state' );
             $rel_id   =~ /(\d+)/;
         my	$index    = $1 - 1;
         # Use the package relationship data to convert the r:id to a filename.
@@ -127,6 +128,7 @@ sub _read_node {
             _index    => $index,
             _rel_id   => $rel_id,
             _filename => $filename,
+            _state => $state,
           };
     }
     
@@ -262,8 +264,8 @@ resolve_names:
 #
 # Convert an Excel A1 style ref to a zero indexed row and column.
 #
-use Memoize;
-memoize('_range_to_rowcol');
+#~ use Memoize;
+#~ memoize('_range_to_rowcol');
 sub _range_to_rowcol {
     my $range = shift or return;
     $range =~s/\$//g;
@@ -292,7 +294,7 @@ sub _range_to_rowcol {
     return $row, $col;
 }
 
-memoize('_rowcol_to_range');
+#~ memoize('_rowcol_to_range');
 sub _rowcol_to_range {
     my ($row, $col, $rlock, $clock) = @_;
     my $range;
@@ -338,6 +340,7 @@ sub _read_worksheets {
             $self->{_styles},
             $sheet->{_name},
             $sheet->{_index},
+            $sheet->{_state},
         );
 
         # Set up the file to read. We don't read data until it is required.

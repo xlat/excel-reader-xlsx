@@ -1,0 +1,40 @@
+{
+   "caption"     : "Test Worksheet::property($propname) method.",
+   "description" : "Test reading worksheet properties.",
+   "xlsx_file"   : "properties01.xlsx",
+   "expected" : {
+	   "FeuilCachée" : {
+		  "col_width" : "10",
+		  "row_height" : "15",
+		  "dimension" : "A1",
+		  "visibility" : "hidden",
+		  "margins" : {
+			 "left" : "0.7",
+			 "header" : "0.3",
+			 "top" : "0.75",
+			 "bottom" : "0.75",
+			 "right" : "0.7",
+			 "footer" : "0.3"
+		  }
+	   },
+	   "Feuil1" : {
+		  "row_height" : "15",
+		  "col_width" : "10",
+		  "visibility" : null,
+		  "selection" : "H13",
+		  "dimension" : "A1:G10",
+		  "margins" : {
+			 "footer" : "0.3",
+			 "right" : "0.7",
+			 "bottom" : "0.75",
+			 "header" : "0.3",
+			 "top" : "0.75",
+			 "left" : "0.7"
+		  },
+		  "tabcolor" : {
+			 "rgb" : "FFFF0000"
+		  }
+	   }
+	}
+}
+

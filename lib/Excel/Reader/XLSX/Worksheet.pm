@@ -19,6 +19,7 @@ use warnings;
 use Carp;
 use Excel::Reader::XLSX::Package::XMLreader;
 use Excel::Reader::XLSX::Row;
+use XML::LibXML::Reader qw(:types);
 
 our @ISA     = qw(Excel::Reader::XLSX::Package::XMLreader);
 our $VERSION = '0.00';
@@ -41,17 +42,104 @@ sub new {
 
     my $class = shift;
     my $self  = Excel::Reader::XLSX::Package::XMLreader->new();
-
     $self->{_shared_strings}      = shift;
     $self->{_styles}              = shift;
     $self->{_name}                = shift;
     $self->{_index}               = shift;
+    my $state 						= shift;
+	
     $self->{_previous_row_number} = -1;
     $self->{row_cache} = [] if $USE_CACHE;
+	$self->{_properties} = { visibility => $state }; 
+	$self->{_views} = [];
+	$self->{_colsprops} = [];
+	$self->{_mergedcells} = [];
 
     bless $self, $class;
-
+	
     return $self;
+}
+
+##############################################################################
+#
+# _read_node()
+#
+# Callback function to read the nodes of the Worksheet.xml file.
+#
+sub _read_node {
+
+    my $self = shift;
+    my $node = shift;
+
+    # Only process the start elements.
+    return unless $node->nodeType() == XML_READER_TYPE_ELEMENT;
+
+    if ( $node->name eq 'tabColor' ) {
+		#may have theme, tint and index?
+		$self->{_properties}{tabcolor} = {
+				rgb => $node->getAttribute( 'rgb' ),
+			};
+    }
+	
+    if ( $node->name eq 'dimension' ) {
+		$self->{_properties}{dimension} = $node->getAttribute('ref');
+	}
+	
+    if ( $node->name eq 'selection' ) {
+		#and sqref attr?
+		$self->{_properties}{selection} = $node->getAttribute('activeCell');
+	}
+	
+    if ( $node->name eq 'sheetFormatPr' ) {
+		#and sqref attr?
+		$self->{_properties}{col_width} = $node->getAttribute('baseColWidth');
+		$self->{_properties}{row_height} = $node->getAttribute('defaultRowHeight');
+	}
+	
+    if ( $node->name eq 'col' ) {
+		my $min = $node->getAttribute('min');
+		my $max = $node->getAttribute('max');
+		my $ref = {
+				width => $node->getAttribute('width'),
+				hidden => $node->getAttribute('hidden'),
+				custom_width => $node->getAttribute('customWidth'),
+			};
+		$self->{_colsprops}[$_] = $ref for ($min-1..$max-1);
+	}
+	
+    if ( $node->name eq 'mergeCell' ) {
+		my $refs = $node->getAttribute('ref');
+		my ($from, $to) = split /:/, $refs;
+		my ($from_row, $from_col) = Excel::Reader::XLSX::Workbook::_range_to_rowcol($from);
+		my ($to_row, $to_col) = Excel::Reader::XLSX::Workbook::_range_to_rowcol($to);
+		($from_row, $to_row) = sort { $a <=> $b } ($from_row, $to_row);
+		($from_col, $to_col) = sort { $a <=> $b } ($from_col, $to_col);
+		push @{$self->{_mergedcells}}, sub{
+			my ($row, $col) = (shift, shift);
+			return $row>=$from_row && $row<=$to_row 
+				&& $col >=$from_col && $col <=$from_col;
+		};
+	}
+	
+    if ( $node->name eq 'pageMargins' ) {
+		$self->{_properties}{margins} = {
+			left => $node->getAttribute('left'),
+			right => $node->getAttribute('right'),
+			top => $node->getAttribute('top'),
+			bottom => $node->getAttribute('bottom'),
+			header => $node->getAttribute('header'),
+			footer => $node->getAttribute('footer'),
+		};
+	}	
+	
+    if ( $node->name eq 'setup' ) {
+		$self->{_properties}{setup} = {
+			paper_size =>  $node->getAttribute('paperSize'),
+			orientation =>  $node->getAttribute('orientation'),
+			#~ rId1 =>  $node->getAttribute('r:id'),
+		};
+	}
+    
 }
 
 ###############################################################################
@@ -427,7 +515,45 @@ sub _init{
                         . $self->{_props}->{_filename};
 
     # Set up the file to read. We don't read data until it is required.
-    $self->_read_file( $filename );
+    $self->_parse_file( $filename );
+    $self->SUPER::rewind;
+	
+}
+
+sub property{
+	
+	my $self = shift;
+	my $propname = shift;
+	
+	return $self->{_properties}{$propname} 
+		if exists $self->{_properties}{$propname};
+	return undef;
+}
+
+sub properties{
+	my $self = shift;
+	
+	return keys %{$self->{_properties}};
+}
+
+sub col_width{
+	my $self = shift;
+	my $col = shift;
+	
+	my $width = $self->{_colsprops}[$col] 
+						// $self->property('col_width');
+}
+
+sub is_merged_rowcol{
+	my $self = shift;
+	my $row = shift;
+	my $col  = shift;
+	
+	for(@{$self->{_mergedcells}}){
+		my $ismerged = $_->($row, $col);
+		return $ismerged if $ismerged;
+	}
+	return 0;
 }
 
 1;

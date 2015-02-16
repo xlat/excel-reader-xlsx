@@ -225,6 +225,41 @@ sub is_underline{
     return exists $self->styles->{font}{u};
 }
 
+sub is_striketrough{
+    
+    my $self = shift;
+    
+    return exists $self->styles->{font}{strike};
+}
+
+
+sub is_superscript{
+    
+    my $self = shift;
+    
+	return exists $self->styles->{font}{vertAlign}
+				? $self->styles->{font}{vertAlign} eq 'superscript'
+				: 0
+				;
+}
+
+sub is_subscript{
+    
+    my $self = shift;
+    
+	return exists $self->styles->{font}{vertAlign}
+				? $self->styles->{font}{vertAlign} eq 'subscript'
+				: 0
+				;
+}
+
+sub is_merged{
+	
+	my $self = shift;
+	
+	return $self->{_sheet}->is_merged_rowcol($self->row, $self->col);
+}
+
 1;
 
 
