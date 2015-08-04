@@ -59,4 +59,4 @@ resources:
   bugtracker: https://github.com/jmcnamara/excel-reader-xlsx/issues
   homepage: https://github.com/jmcnamara
   repository: git://github.com///github.com/jandrew/excel-reader-xlsx.git
-version: v0.001_003
+version: v0.001_006

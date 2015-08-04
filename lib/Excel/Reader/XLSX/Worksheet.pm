@@ -74,29 +74,30 @@ sub _read_node {
     # Only process the start elements.
     return unless $node->nodeType() == XML_READER_TYPE_ELEMENT;
 
-    if ( $node->name eq 'tabColor' ) {
+	my $name = $node->name;
+    if ( $name eq 'tabColor' ) {
 		#may have theme, tint and index?
 		$self->{_properties}{tabcolor} = {
 				rgb => $node->getAttribute( 'rgb' ),
 			};
     }
 	
-    if ( $node->name eq 'dimension' ) {
+    if ( $name eq 'dimension' ) {
 		$self->{_properties}{dimension} = $node->getAttribute('ref');
 	}
 	
-    if ( $node->name eq 'selection' ) {
+    if ( $name eq 'selection' ) {
 		#and sqref attr?
 		$self->{_properties}{selection} = $node->getAttribute('activeCell');
 	}
 	
-    if ( $node->name eq 'sheetFormatPr' ) {
+    if ( $name eq 'sheetFormatPr' ) {
 		#and sqref attr?
 		$self->{_properties}{col_width} = $node->getAttribute('baseColWidth');
 		$self->{_properties}{row_height} = $node->getAttribute('defaultRowHeight');
 	}
 	
-    if ( $node->name eq 'col' ) {
+    if ( $name eq 'col' ) {
 		my $min = $node->getAttribute('min');
 		my $max = $node->getAttribute('max');
 		my $ref = {
@@ -107,7 +108,7 @@ sub _read_node {
 		$self->{_colsprops}[$_] = $ref for ($min-1..$max-1);
 	}
 	
-    if ( $node->name eq 'mergeCell' ) {
+    if ( $name eq 'mergeCell' ) {
 		my $refs = $node->getAttribute('ref');
 		my ($from, $to) = split /:/, $refs;
 		my ($from_row, $from_col) = Excel::Reader::XLSX::Workbook::_range_to_rowcol($from);
@@ -121,7 +122,7 @@ sub _read_node {
 		};
 	}
 	
-    if ( $node->name eq 'pageMargins' ) {
+    if ( $name eq 'pageMargins' ) {
 		$self->{_properties}{margins} = {
 			left => $node->getAttribute('left'),
 			right => $node->getAttribute('right'),
@@ -132,7 +133,7 @@ sub _read_node {
 		};
 	}	
 	
-    if ( $node->name eq 'setup' ) {
+    if ( $name eq 'setup' ) {
 		$self->{_properties}{setup} = {
 			paper_size =>  $node->getAttribute('paperSize'),
 			orientation =>  $node->getAttribute('orientation'),

@@ -222,9 +222,7 @@ sub values {
     }
 
     # Convert any undef values to an empty string.
-    for my $value ( @values ) {
-        $value = '' if !defined $value;
-    }
+    $_ //= '' for @values;
 
     # Store the values to allow multiple calls return the same data.
     $self->{_values} = \@values;
