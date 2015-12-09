@@ -178,7 +178,6 @@ sub styles{
     my $self = shift;
 
     #FIXME: take in account row->{_styleId} as a parent style to inherit from (if any).
-    $DB::single = 1 if $self->range eq 'B1';
     $self->{_styles} //= $self->{_sheet}{_styles}->get_style($self->{_styleId});
     
     return $self->{_styles};

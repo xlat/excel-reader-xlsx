@@ -75,26 +75,37 @@ sub _read_node {
     return unless $node->nodeType() == XML_READER_TYPE_ELEMENT;
 
 	my $name = $node->name;
+    if ( $self->{NO_DATA} && $name eq 'sheetData' ) {
+        $self->{_reader}->next;
+        $node = $self->{_reader};
+        $name = $node->name;
+        return if $name eq 'sheetData';
+    }
+    
     if ( $name eq 'tabColor' ) {
 		#may have theme, tint and index?
 		$self->{_properties}{tabcolor} = {
 				rgb => $node->getAttribute( 'rgb' ),
 			};
+        return;
     }
 	
     if ( $name eq 'dimension' ) {
 		$self->{_properties}{dimension} = $node->getAttribute('ref');
+        return;
 	}
 	
     if ( $name eq 'selection' ) {
 		#and sqref attr?
 		$self->{_properties}{selection} = $node->getAttribute('activeCell');
+        return;
 	}
 	
     if ( $name eq 'sheetFormatPr' ) {
 		#and sqref attr?
 		$self->{_properties}{col_width} = $node->getAttribute('baseColWidth');
 		$self->{_properties}{row_height} = $node->getAttribute('defaultRowHeight');
+        return;
 	}
 	
     if ( $name eq 'col' ) {
@@ -106,6 +117,7 @@ sub _read_node {
 				custom_width => $node->getAttribute('customWidth'),
 			};
 		$self->{_colsprops}[$_] = $ref for ($min-1..$max-1);
+        return;
 	}
 	
     if ( $name eq 'mergeCell' ) {
@@ -120,6 +132,7 @@ sub _read_node {
 			return $row>=$from_row && $row<=$to_row 
 				&& $col >=$from_col && $col <=$from_col;
 		};
+        return;
 	}
 	
     if ( $name eq 'pageMargins' ) {
@@ -131,14 +144,16 @@ sub _read_node {
 			header => $node->getAttribute('header'),
 			footer => $node->getAttribute('footer'),
 		};
+        return;
 	}	
 	
-    if ( $name eq 'setup' ) {
+    if ( $name =~ /pageSetup|setup/ ) {
 		$self->{_properties}{setup} = {
 			paper_size =>  $node->getAttribute('paperSize'),
 			orientation =>  $node->getAttribute('orientation'),
 			#~ rId1 =>  $node->getAttribute('r:id'),
 		};
+        return;
 	}
     
 }
@@ -508,17 +523,18 @@ sub resolve_external_workbook{
 # manipulation to build XML reader on demand. (eg: _init_link )
 #
 sub _init{
-        my $self = shift;
-        $self->{_book} = shift;
-        $self->{_props} = shift;    # from workbook _worksheet_properties
-        my $filename =  $self->{_book}->{_package_dir}
-                        . $self->{_book}->{_workbook_root}
-                        . $self->{_props}->{_filename};
+    my $self = shift;
+    $self->{_book} = shift;
+    $self->{_props} = shift;    # from workbook _worksheet_properties
+    my $filename =  $self->{_book}->{_package_dir}
+                    . $self->{_book}->{_workbook_root}
+                    . $self->{_props}->{_filename};
 
     # Set up the file to read. We don't read data until it is required.
+    $self->{NO_DATA} = 1;
     $self->_parse_file( $filename );
+    $self->{NO_DATA} = 0;
     $self->SUPER::rewind;
-	
 }
 
 sub property{

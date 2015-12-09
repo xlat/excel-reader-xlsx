@@ -16,6 +16,11 @@ v0.001_006 2015-08-04
 
 * small speed optimisation in Worksheet::_read_node
 
+v0.001_008 2015-12-09
+
+* revert memoize in Workbook (consume too much memory!)
+* ignore sheetData while populating worksheet properties
+
 {{$NEXT}}
 
 * Some other cool change

@@ -3,18 +3,18 @@ abstract: "Efficient data reader for the Excel XLSX file format.\r"
 author:
   - 'John McNamara <jmcnamara@cpan.org>'
 build_requires:
-  JSON: 0
-  Test::Differences: 0
-  Test::More: 0
-  lib: 0
+  JSON: '0'
+  Test::Differences: '0'
+  Test::More: '0'
+  lib: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 6.30
+  ExtUtils::MakeMaker: '6.30'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.300037, CPAN::Meta::Converter version 2.120921'
+generated_by: 'Dist::Zilla version 4.300037, CPAN::Meta::Converter version 2.120921, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: excel-reader-xlsx
 provides:
   Excel::Reader::XLSX:
@@ -45,18 +45,19 @@ provides:
     file: lib/Excel/Reader/XLSX/Worksheet.pm
     version: v0.1_3
 requires:
-  Archive::Zip: 0
-  Carp: 0
-  Exporter: 0
-  File::Temp: 0
-  OLE::Storage_Lite: 0
-  XML::LibXML::Reader: 0
-  perl: 5.008002
-  strict: 0
-  version: 0
-  warnings: 0
+  Archive::Zip: '0'
+  Carp: '0'
+  Exporter: '0'
+  File::Temp: '0'
+  OLE::Storage_Lite: '0'
+  XML::LibXML::Reader: '0'
+  XML::Simple::Tiny: '0'
+  strict: '0'
+  version: '0'
+  warnings: '0'
 resources:
   bugtracker: https://github.com/jmcnamara/excel-reader-xlsx/issues
   homepage: https://github.com/jmcnamara
   repository: git://github.com///github.com/jandrew/excel-reader-xlsx.git
 version: v0.001_008
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

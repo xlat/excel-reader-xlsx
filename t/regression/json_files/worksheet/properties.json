@@ -31,6 +31,10 @@
 			 "top" : "0.75",
 			 "left" : "0.7"
 		  },
+          "setup" : {
+             "orientation" : "portrait",
+             "paper_size" : "9"
+          },
 		  "tabcolor" : {
 			 "rgb" : "FFFF0000"
 		  }

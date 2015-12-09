@@ -4,7 +4,7 @@
       "John McNamara <jmcnamara@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 4.300037, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "Dist::Zilla version 4.300037, CPAN::Meta::Converter version 2.120921, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -14,6 +14,9 @@
    },
    "name" : "excel-reader-xlsx",
    "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "6.30"
@@ -27,7 +30,7 @@
             "File::Temp" : "0",
             "OLE::Storage_Lite" : "0",
             "XML::LibXML::Reader" : "0",
-            "perl" : "5.008002",
+            "XML::Simple::Tiny" : "0",
             "strict" : "0",
             "version" : "0",
             "warnings" : "0"
@@ -92,6 +95,6 @@
          "web" : "https://github.com///github.com/jandrew/excel-reader-xlsx"
       }
    },
-   "version" : "v0.001_008"
+   "version" : "v0.001_008",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
 }
-
