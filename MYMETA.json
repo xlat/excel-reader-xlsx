@@ -4,7 +4,7 @@
       "John McNamara <jmcnamara@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 4.300037, CPAN::Meta::Converter version 2.120921, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 4.300037, CPAN::Meta::Converter version 2.120921, CPAN::Meta::Converter version 2.143240",
    "license" : [
       "perl_5"
    ],
@@ -95,6 +95,5 @@
          "web" : "https://github.com///github.com/jandrew/excel-reader-xlsx"
       }
    },
-   "version" : "v0.001_008",
-   "x_serialization_backend" : "JSON::PP version 2.27203"
+   "version" : "v0.001_008"
 }
