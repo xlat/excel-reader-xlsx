@@ -37,7 +37,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "lib" => 0
   },
-  "VERSION" => "v0.001_008",
+  "VERSION" => "v0.001_009",
   "test" => {
     "TESTS" => "t/package/content_types/*.t t/package/shared_strings/*.t t/regression/*.t t/regression/workbook/*.t t/regression/worksheet/*.t"
   }

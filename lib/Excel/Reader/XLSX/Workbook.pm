@@ -415,6 +415,18 @@ sub fullname{
 	
 	return $self->{_fullname};
 }
+
+sub close{
+  my ($self) = @_;
+  # close properly all objects
+  $self->{_shared_strings}{_reader}->close;
+  $self->{_reader}->close;
+  foreach my $wsh (@{$self->{_worksheets}}) {
+    $wsh->{_styles}{_reader}->close;
+    $wsh->{_reader}->close;
+  }
+}
+
 1;
 
 
