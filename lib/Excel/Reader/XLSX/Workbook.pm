@@ -416,6 +416,7 @@ sub fullname{
 	return $self->{_fullname};
 }
 
+
 sub _close_reader {
   my ($self, $reader) = @_;
   $reader->close if defined $reader;
