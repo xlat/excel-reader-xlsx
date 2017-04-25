@@ -79,6 +79,10 @@ sub _read_all_nodes {
        #    push @{ $self->{_strings} },
        #      [ $RICH_STRING, $string, $rich_string ];
     }
+    
+    # ensure _unique_count and _count are set even if not present in the XML file
+    $self->{_unique_count} = scalar @{ $self->{_strings} } if !defined $self->{_unique_count};
+    $self->{_count} = $self->{_unique_count} if !defined $self->{_count};
 }
 
 

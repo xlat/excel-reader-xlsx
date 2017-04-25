@@ -1,10 +1,10 @@
 {
-   "abstract" : "Efficient data reader for the Excel XLSX file format.\r",
+   "abstract" : "Efficient data reader for the Excel XLSX file format.",
    "author" : [
       "John McNamara <jmcnamara@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 4.300037, CPAN::Meta::Converter version 2.120921, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.143240, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -13,6 +13,12 @@
       "version" : "2"
    },
    "name" : "excel-reader-xlsx",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
    "prereqs" : {
       "build" : {
          "requires" : {}
@@ -45,56 +51,7 @@
          }
       }
    },
-   "provides" : {
-      "Excel::Reader::XLSX" : {
-         "file" : "lib/Excel/Reader/XLSX.pm",
-         "version" : "v0.1_3"
-      },
-      "Excel::Reader::XLSX::Cell" : {
-         "file" : "lib/Excel/Reader/XLSX/Cell.pm",
-         "version" : "v0.1_3"
-      },
-      "Excel::Reader::XLSX::Package::ContentTypes" : {
-         "file" : "lib/Excel/Reader/XLSX/Package/ContentTypes.pm",
-         "version" : "v0.1_3"
-      },
-      "Excel::Reader::XLSX::Package::Relationship" : {
-         "file" : "lib/Excel/Reader/XLSX/Package/Relationships.pm",
-         "version" : "v0.1_3"
-      },
-      "Excel::Reader::XLSX::Package::SharedStrings" : {
-         "file" : "lib/Excel/Reader/XLSX/Package/SharedStrings.pm",
-         "version" : "v0.1_3"
-      },
-      "Excel::Reader::XLSX::Package::XMLreader" : {
-         "file" : "lib/Excel/Reader/XLSX/Package/XMLreader.pm",
-         "version" : "v0.1_3"
-      },
-      "Excel::Reader::XLSX::Row" : {
-         "file" : "lib/Excel/Reader/XLSX/Row.pm",
-         "version" : "v0.1_3"
-      },
-      "Excel::Reader::XLSX::Workbook" : {
-         "file" : "lib/Excel/Reader/XLSX/Workbook.pm",
-         "version" : "v0.1_3"
-      },
-      "Excel::Reader::XLSX::Worksheet" : {
-         "file" : "lib/Excel/Reader/XLSX/Worksheet.pm",
-         "version" : "v0.1_3"
-      }
-   },
-   "release_status" : "testing",
-   "resources" : {
-      "bugtracker" : {
-         "web" : "https://github.com/jmcnamara/excel-reader-xlsx/issues"
-      },
-      "homepage" : "https://github.com/jmcnamara",
-      "repository" : {
-         "type" : "git",
-         "url" : "git://github.com///github.com/jandrew/excel-reader-xlsx.git",
-         "web" : "https://github.com///github.com/jandrew/excel-reader-xlsx"
-      }
-   },
-   "version" : "v0.001_008",
-   "x_serialization_backend" : "JSON::PP version 2.27203"
+   "release_status" : "unstable",
+   "version" : "v0.001_011",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
 }
