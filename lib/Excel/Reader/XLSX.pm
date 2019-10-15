@@ -27,7 +27,7 @@ use Excel::Reader::XLSX::Package::Styles;
 Archive::Zip::setErrorHandler( sub { die shift } );
 
 our @ISA     = qw(Exporter);
-use version; our $VERSION = version->declare("v0.001_010");
+use version; our $VERSION = version->declare("v0.001_011");
 
 # Error codes for some common errors.
 our $ERROR_none                      = 0;
@@ -255,7 +255,7 @@ sub _check_if_ole_file {
     my $pps      = $ole->getPpsTree();
 
     # If getPpsTree() failed then this isn't an OLE file.
-    return if !$pps;
+    return if !$pps || $filename !~ /\.xlsx$/; # hack to catch errors with xlsx file
 
     # Loop through the PPS children below the root.
     for my $child_pps ( @{ $pps->{Child} } ) {
