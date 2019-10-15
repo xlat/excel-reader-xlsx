@@ -255,7 +255,7 @@ sub _check_if_ole_file {
     my $pps      = $ole->getPpsTree();
 
     # If getPpsTree() failed then this isn't an OLE file.
-    return if !$pps;
+    return if !$pps || $filename !~ /\.xlsx$/; # hack to catch errors with xlsx file
 
     # Loop through the PPS children below the root.
     for my $child_pps ( @{ $pps->{Child} } ) {
