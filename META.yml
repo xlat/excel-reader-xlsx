@@ -1,62 +1,34 @@
 ---
-abstract: "Efficient data reader for the Excel XLSX file format.\r"
+abstract: 'Efficient data reader for the Excel XLSX file format.'
 author:
   - 'John McNamara <jmcnamara@cpan.org>'
 build_requires:
-  JSON: 0
-  Test::Differences: 0
-  Test::More: 0
-  lib: 0
+  JSON: '0'
+  Test::Differences: '0'
+  Test::More: '0'
+  lib: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 6.30
-dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.300037, CPAN::Meta::Converter version 2.120921'
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.143240'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: excel-reader-xlsx
-provides:
-  Excel::Reader::XLSX:
-    file: lib/Excel/Reader/XLSX.pm
-    version: v0.1_3
-  Excel::Reader::XLSX::Cell:
-    file: lib/Excel/Reader/XLSX/Cell.pm
-    version: v0.1_3
-  Excel::Reader::XLSX::Package::ContentTypes:
-    file: lib/Excel/Reader/XLSX/Package/ContentTypes.pm
-    version: v0.1_3
-  Excel::Reader::XLSX::Package::Relationship:
-    file: lib/Excel/Reader/XLSX/Package/Relationships.pm
-    version: v0.1_3
-  Excel::Reader::XLSX::Package::SharedStrings:
-    file: lib/Excel/Reader/XLSX/Package/SharedStrings.pm
-    version: v0.1_3
-  Excel::Reader::XLSX::Package::XMLreader:
-    file: lib/Excel/Reader/XLSX/Package/XMLreader.pm
-    version: v0.1_3
-  Excel::Reader::XLSX::Row:
-    file: lib/Excel/Reader/XLSX/Row.pm
-    version: v0.1_3
-  Excel::Reader::XLSX::Workbook:
-    file: lib/Excel/Reader/XLSX/Workbook.pm
-    version: v0.1_3
-  Excel::Reader::XLSX::Worksheet:
-    file: lib/Excel/Reader/XLSX/Worksheet.pm
-    version: v0.1_3
+no_index:
+  directory:
+    - t
+    - inc
 requires:
-  Archive::Zip: 0
-  Carp: 0
-  Exporter: 0
-  File::Temp: 0
-  OLE::Storage_Lite: 0
-  XML::LibXML::Reader: 0
-  perl: 5.008002
-  strict: 0
-  version: 0
-  warnings: 0
-resources:
-  bugtracker: https://github.com/jmcnamara/excel-reader-xlsx/issues
-  homepage: https://github.com/jmcnamara
-  repository: git://github.com///github.com/jandrew/excel-reader-xlsx.git
-version: v0.001_008
+  Archive::Zip: '0'
+  Carp: '0'
+  Exporter: '0'
+  File::Temp: '0'
+  OLE::Storage_Lite: '0'
+  XML::LibXML::Reader: '0'
+  XML::Simple::Tiny: '0'
+  strict: '0'
+  version: '0'
+  warnings: '0'
+version: v0.001_011
