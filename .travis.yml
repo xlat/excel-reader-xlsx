@@ -14,6 +14,7 @@ before_install:
   - cd $BUILD_DIR
   
 install:
+  - cpanm --quiet --notest https://github.com/xlat/XML-Simple-Tiny.git
   - cpanm --quiet --notest --installdeps .
 
 notifications:
