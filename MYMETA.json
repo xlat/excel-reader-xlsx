@@ -89,7 +89,9 @@
          "version" : "v0.1_3"
       }
    },
-   "release_status" : "testing",
+   "release_status" : "unstable",
+   "version" : "v0.001_012",
+   "x_serialization_backend" : "JSON::PP version 2.27300",
    "resources" : {
       "bugtracker" : {
          "web" : "https://github.com/jmcnamara/excel-reader-xlsx/issues"
@@ -101,7 +103,4 @@
          "web" : "https://github.com///github.com/jandrew/excel-reader-xlsx"
       }
    },
-   "release_status" : "unstable",
-   "version" : "v0.001_011",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
 }
