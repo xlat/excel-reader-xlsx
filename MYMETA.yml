@@ -31,5 +31,9 @@ requires:
   strict: '0'
   version: '0'
   warnings: '0'
-version: v0.001_011
+resources:
+  bugtracker: https://github.com/jmcnamara/excel-reader-xlsx/issues
+  homepage: https://github.com/jmcnamara
+  repository: git://github.com///github.com/jandrew/excel-reader-xlsx.git
+version: v0.001_012
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
