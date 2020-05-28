@@ -125,10 +125,15 @@ sub _get_cell_node_column{
     return $col;
 }
 
+sub _mk_range {
+    my ($self, $col_index) = @_;
+    return Excel::Reader::XLSX::Workbook::_rowcol_to_range( $self->{_row_number}, $col_index );
+}
+
 sub _mk_cell{
     my ($self, $col_index) = @_;
     my $cell_node = $self->{_cells}->[ $col_index ] or return;
-    my $range = $cell_node->getAttribute( 'r' ) or return;
+    my $range = $cell_node->getAttribute( 'r' ) // $self->_mk_range($col_index);
     # Create or re-use (for efficiency) a Cell object.
     my $cell = $self->{_cell};
     $cell->_init();
