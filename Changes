@@ -1,4 +1,4 @@
-Revision history for Perl module Excel::Reader::XLSX.
+Revision history for {{$dist->name}}
 
 + New feature.
 - Removed/deprecated feature.
@@ -23,5 +23,5 @@ v0.001_008 2015-12-09
 
 {{$NEXT}}
 
-* Some other cool change
+* Accept sheet containing cells without 'r' (range) attribut
 

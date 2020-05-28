@@ -4,9 +4,7 @@ use warnings;
 
 use 5.008002;
 
-use ExtUtils::MakeMaker 6.30;
-
-
+use ExtUtils::MakeMaker 7.24;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Efficient data reader for the Excel XLSX file format.",
