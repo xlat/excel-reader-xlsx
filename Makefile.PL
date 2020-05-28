@@ -9,7 +9,7 @@ use ExtUtils::MakeMaker 6.30;
 
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Efficient data reader for the Excel XLSX file format.\r",
+  "ABSTRACT" => "Efficient data reader for the Excel XLSX file format.",
   "AUTHOR" => "John McNamara <jmcnamara\@cpan.org>",
   "BUILD_REQUIRES" => {},
   "CONFIGURE_REQUIRES" => {
