@@ -24,4 +24,4 @@ v0.001_008 2015-12-09
 {{$NEXT}}
 
 * Accept sheet containing cells without 'r' (range) attribut
-
+* Use sheetId prior to r:id to get sheet-index

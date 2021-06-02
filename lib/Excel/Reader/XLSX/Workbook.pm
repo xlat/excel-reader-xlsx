@@ -116,7 +116,7 @@ sub _read_node {
         my	$rel_id   = $node->getAttribute( 'r:id' );
         my	$state   = $node->getAttribute( 'state' );
             $rel_id   =~ /(\d+)/;
-        my	$index    = $1 - 1;
+        my	$index    = ($sheet_id // $1) - 1;
         # Use the package relationship data to convert the r:id to a filename.
         my	$filename = $self->{_rels}->{$rel_id}->{_target};
 
