@@ -35,9 +35,14 @@ my $reader   = Excel::Reader::XLSX->new();
 my $workbook = $reader->read_file( $xlsx_file );
 
 for my $worksheet ( $workbook->worksheets() ) {
+    
+    push @$got, [$worksheet->index(), $worksheet->name()];
 
-    my $sheetname = $worksheet->index();
-    push @$got, $sheetname;
+}
+
+for my $name ( map { $_->name } $workbook->worksheets() ) {
+    my $worksheet = $workbook->worksheet($name);
+    push @$got, [$name, $worksheet->index(), $worksheet->name()];
 
 }
 

@@ -36,7 +36,7 @@ my %WriteMakefileArgs = (
     "lib" => 0
   },
 
-  "VERSION" => "v0.001_015",
+  "VERSION" => "v0.001_016",
 
   "test" => {
     "TESTS" => "t/package/content_types/*.t t/package/shared_strings/*.t t/regression/*.t t/regression/workbook/*.t t/regression/worksheet/*.t"

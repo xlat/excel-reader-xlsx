@@ -21,7 +21,15 @@ v0.001_008 2015-12-09
 * revert memoize in Workbook (consume too much memory!)
 * ignore sheetData while populating worksheet properties
 
-{{$NEXT}}
+v0.001_0014 2021-05-19
 
 * Accept sheet containing cells without 'r' (range) attribut
+
+v0.001_0015 2021-06-02
+
 * Use sheetId prior to r:id to get sheet-index
+
+{{$NEXT}}
+
+* use sheet-index is now the index of sheet declaration
+* ignore missing files by default

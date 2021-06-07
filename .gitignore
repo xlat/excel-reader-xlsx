@@ -11,3 +11,9 @@ TAGS
 .#*
 *#
 ~*xlsx
+/t/regression/json_files/worksheet/index2.json
+/t/regression/json_files/worksheet/index3.json
+/t/regression/worksheet/index2.t
+/t/regression/worksheet/index3.t
+/t/regression/xlsx_files/index2.xlsx
+/t/regression/xlsx_files/index3.xlsx

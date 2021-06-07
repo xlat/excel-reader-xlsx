@@ -27,7 +27,7 @@ use Excel::Reader::XLSX::Package::Styles;
 Archive::Zip::setErrorHandler( sub { die shift } );
 
 our @ISA     = qw(Exporter);
-use version; our $VERSION = version->declare("v0.001_015");
+use version; our $VERSION = version->declare("v0.001_016");
 
 # Error codes for some common errors.
 our $ERROR_none                      = 0;
@@ -88,6 +88,7 @@ sub read_file {
 
     my $self     = shift;
     my $filename = shift;
+    my %opts     = @_;
 
     # Check that the file exists.
     if ( !-e $filename ) {
@@ -150,7 +151,7 @@ sub read_file {
 
     if ( !$files_exist ) {
         $self->{_error_status} = $ERROR_file_missing_subfile;
-        return;
+        return if $opts{all_files_required};
     }
 
     # Verify that the workbook.xml file is listed.
